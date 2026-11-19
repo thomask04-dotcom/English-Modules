@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Literacy and English | CEDoW</title>
+<style>
+    :root {
+      --cedow-dark-blue: #0D2C6B;
+      --cedow-white: #FFFFFF;
+      --cedow-silver: #D1D2D4;
+      --cedow-black: #231F20;
+      --cedow-aqua: #188296;
+      --cedow-charcoal: #4C4C4E;
+      --cedow-gold: #FBAF3F;
+      --bg-light: #F4F6F9;
+      --wr: var(--cedow-dark-blue);   /* Transcription · Constrained · Literacy */
+      --lc: var(--cedow-aqua);        /* Composition · Unconstrained · English */
+      --wr-tint: #E8EAF6;
+      --lc-tint: #E0F2F1;
+      --success: #2E7D32;
+      --error: #C62828;
+      --border-radius: 8px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--cedow-black);
+      line-height: 1.6;
+      padding: 1rem;
+    }
+
+    button { font-family: inherit; }
+
+    :focus-visible { outline: 3px solid var(--cedow-gold); outline-offset: 2px; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--cedow-dark-blue);
+      color: var(--cedow-white);
+      padding: 2rem;
+      border-bottom: 5px solid var(--cedow-gold);
+    }
+
+    header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.25; }
+
+    header p {
+      color: var(--cedow-silver);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-container { background: #E5E7EB; height: 6px; width: 100%; }
+
+    .progress-bar {
+      background: var(--cedow-aqua);
+      height: 100%;
+      width: 6.67%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      background: #EAECEF;
+      border-bottom: 1px solid var(--cedow-silver);
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 150px;
+      padding: 1rem 0.5rem;
+      background: none;
+      border: none;
+      border-top: 4px solid transparent;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--cedow-charcoal);
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .tab-btn:hover { background: #F4F5F7; }
+
+    .tab-btn.active {
+      background: #FFFFFF;
+      color: var(--cedow-dark-blue);
+      border-top-color: var(--cedow-aqua);
+    }
+
+    .content-section { display: none; padding: 2.5rem; }
+    .content-section.active { display: block; }
+
+    h2 {
+      color: var(--cedow-dark-blue);
+      margin-bottom: 1.2rem;
+      font-size: 1.6rem;
+      border-bottom: 2px solid var(--cedow-silver);
+      padding-bottom: 0.5rem;
+    }
+
+    h3 { color: var(--cedow-aqua); margin: 1.5rem 0 0.8rem 0; font-size: 1.25rem; }
+    h4 { color: var(--cedow-dark-blue); margin: 1rem 0 0.5rem 0; font-size: 1.1rem; }
+
+    p, li {
+      color: var(--cedow-charcoal);
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    ul { margin-left: 1.5rem; margin-bottom: 1.5rem; }
+
+    .two-col { display: flex; gap: 2rem; margin-bottom: 2rem; }
+    .two-col > div { flex: 1; }
+
+    /* Accordion */
+    .accordion-item {
+      border: 1px solid var(--cedow-silver);
+      border-radius: 6px;
+      margin-bottom: 0.8rem;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      background: #F8FAFC;
+      border: none;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      color: var(--cedow-dark-blue);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.05rem;
+      text-align: left;
+    }
+
+    .accordion-header:hover { background: #EDF2F7; }
+    .accordion-header .chev { transition: transform 0.2s; flex-shrink: 0; }
+    .accordion-header[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+    .accordion-content {
+      display: none;
+      padding: 1.5rem;
+      background: #FFFFFF;
+      border-top: 1px solid var(--cedow-silver);
+    }
+    .accordion-content.open { display: block; }
+
+    /* Reading Rope image */
+    .rope-image-wrapper {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #F8FAFC;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--cedow-silver);
+    }
+    .rope-image-wrapper svg { min-width: 640px; }
+    .rope-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .rope-hint { display: none; font-size: 0.8rem; font-style: italic; margin: 0.4rem 0 0; }
+    @media (max-width: 720px) { .rope-hint { display: block; } }
+
+    /* Rope interactive cards */
+    .rope-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .strand-card { background: #FFF; border: 2px solid; border-radius: 6px; padding: 1.5rem; }
+    .strand-card.upper { border-color: var(--lc); }
+    .strand-card.lower { border-color: var(--wr); }
+
+    .sub-strand {
+      width: 100%;
+      text-align: left;
+      background: #EAECEF;
+      border: 2px solid transparent;
+      color: var(--cedow-black);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0.3rem 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: block;
+    }
+
+    .strand-card.upper .sub-strand:hover,
+    .strand-card.upper .sub-strand.active { background: #E0F2F1; color: var(--cedow-aqua); }
+    .strand-card.upper .sub-strand.active { border-color: var(--cedow-aqua); }
+    .strand-card.lower .sub-strand:hover,
+    .strand-card.lower .sub-strand.active { background: #E8EAF6; color: var(--cedow-dark-blue); }
+    .strand-card.lower .sub-strand.active { border-color: var(--cedow-dark-blue); }
+
+    #strandDetailCard {
+      background: #FFF;
+      border-left: 5px solid var(--cedow-gold);
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 1.5rem;
+      border-radius: 4px;
+    }
+    #strandDetailCard p { margin-bottom: 0; }
+
+    /* Sorting activity */
+    .sort-bank {
+      background: #FFFBF2;
+      border: 2px solid var(--cedow-gold);
+      border-radius: var(--border-radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .sort-bank h4 { margin-top: 0; }
+    .sort-bank .empty-msg { margin: 0.5rem 0 0; font-style: italic; }
+
+    .sort-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      background: #FFFFFF;
+      border: 1px solid var(--cedow-silver);
+      border-radius: 4px;
+      padding: 0.6rem 0.8rem;
+      margin: 0.5rem 0;
+      font-weight: 600;
+    }
+    .sort-item.shake { animation: shake 0.35s; border-color: var(--error); }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .sort-choices { display: flex; gap: 0.4rem; }
+    .sort-choices button {
+      border: none;
+      border-radius: 4px;
+      padding: 0.45rem 0.8rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #FFFFFF;
+      cursor: pointer;
+    }
+    .sort-choices .to-lit { background: var(--wr); }
+    .sort-choices .to-eng { background: var(--lc); }
+    .sort-choices button:hover { filter: brightness(1.15); }
+
+    .classifier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .bank-box {
+      background: #F8FAFC;
+      border: 2px dashed var(--cedow-silver);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      min-height: 200px;
+    }
+    .bank-box h4 { text-align: center; margin-top: 0; }
+    .bank-box.lit { border-color: var(--wr); background: #F6F7FC; }
+    .bank-box.eng { border-color: var(--lc); background: #F3FAFA; }
+    .bank-box.lit h4 { color: var(--wr); }
+    .bank-box.eng h4 { color: var(--lc); }
+    .bank-box.lit .item-chip { background: var(--wr); }
+    .bank-box.eng .item-chip { background: var(--lc); }
+
+    .item-chip {
+      background: var(--success);
+      color: #FFFFFF;
+      padding: 0.7rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      animation: pop 0.25s ease;
+    }
+    @keyframes pop { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+    #sorterFeedback {
+      margin-top: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      font-size: 1.05rem;
+      min-height: 1.6em;
+    }
+    #sorterFeedback.ok { color: var(--success); }
+    #sorterFeedback.bad { color: var(--error); }
+
+    .sort-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .sort-score { font-weight: 700; color: var(--cedow-dark-blue); }
+
+    /* 90-min visualiser */
+    .time-bar-wrapper {
+      display: flex;
+      height: 50px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .time-literacy, .time-english {
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: width 0.4s ease;
+    }
+    .time-literacy { background: var(--wr); }
+    .time-english { background: var(--lc); }
+
+    .stage-btn-group { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+    .stage-btn {
+      padding: 0.8rem 1.2rem;
+      background: var(--cedow-silver);
+      color: var(--cedow-black);
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .stage-btn:hover { background: #C2C3C6; }
+    .stage-btn.active { background: var(--cedow-dark-blue); color: #FFFFFF; }
+
+    #stageDetailsBox {
+      background: #F8FAFC;
+      padding: 1.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--cedow-silver);
+      margin-top: 1.5rem;
+    }
+    #stageDetailsBox .two-col { margin-bottom: 0; }
+    #stageDetailsBox ul { margin-bottom: 0; }
+
+    /* Diagnostics */
+    .scenario-card {
+      background: #FFFFFF;
+      border-left: 4px solid var(--cedow-gold);
+      margin-bottom: 1.2rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .scenario-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.5rem;
+      cursor: pointer;
+      color: var(--cedow-black);
+      font-size: 1rem;
+    }
+    .scenario-toggle:hover { background: #FAFAFA; }
+    .scenario-toggle strong { display: flex; justify-content: space-between; gap: 1rem; }
+    .scenario-toggle .chev { transition: transform 0.2s; flex-shrink: 0; }
+    .scenario-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    .scenario-toggle p { margin: 0.5rem 0 0; font-size: 0.95rem; }
+
+    .scenario-answer {
+      display: none;
+      margin: 0 1.5rem;
+      padding: 1rem 0 0.5rem;
+      border-top: 1px solid var(--cedow-silver);
+    }
+    .scenario-answer.open { display: block; }
+
+    /* Reflection */
+    label { display: block; }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 1rem;
+      border: 1px solid var(--cedow-silver);
+      border-radius: 4px;
+      margin: 0.5rem 0 1.5rem 0;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    .btn-action {
+      background: var(--cedow-aqua);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0 0.8rem 0.8rem 0;
+    }
+    .btn-action:hover { background: var(--cedow-dark-blue); }
+    .btn-action.secondary { background: var(--cedow-silver); color: var(--cedow-black); }
+    .btn-action.secondary:hover { background: #C2C3C6; }
+
+    #copyStatus { font-weight: 600; color: var(--success); min-height: 1.5em; }
+
+    /* Prev / next */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem 2rem;
+      gap: 1rem;
+    }
+    .step-nav .btn-action { margin: 0; }
+    .step-nav .btn-action:disabled { opacity: 0.4; cursor: default; background: var(--cedow-silver); color: var(--cedow-black); }
+    #stepCounter { font-weight: 600; color: var(--cedow-charcoal); font-size: 0.9rem; }
+
+    /* Key terms */
+    .terms-note {
+      background: #F0F7F8;
+      border-left: 4px solid var(--cedow-aqua);
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      margin: 1.5rem 0 0.5rem;
+      font-size: 0.95rem;
+      color: var(--cedow-charcoal);
+    }
+    .term-sample, .term {
+      text-decoration: underline dotted var(--cedow-aqua);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+    .term {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      cursor: help;
+    }
+    .term:hover, .term[aria-expanded="true"] { color: var(--cedow-aqua); }
+    .term .dagger { font-size: 0.75em; vertical-align: super; margin-left: 1px; }
+
+    #termPopover {
+      position: absolute;
+      z-index: 50;
+      max-width: 340px;
+      background: #FFFFFF;
+      border: 1px solid var(--cedow-silver);
+      border-top: 4px solid var(--cedow-aqua);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      padding: 0.9rem 1rem;
+      display: none;
+    }
+    #termPopover.other { border-top-color: var(--cedow-gold); }
+    #termPopover h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    #termPopover p { font-size: 0.92rem; margin: 0 0 0.4rem; line-height: 1.55; }
+    #termPopover .src { font-size: 0.78rem; color: #6B6B6E; margin: 0; }
+
+    .def { background: #F8FAFC; border-radius: 4px; padding: 0.7rem 0.9rem; }
+    .def-label {
+      display: inline-block;
+      background: var(--cedow-aqua);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      margin-right: 0.35rem;
+      vertical-align: 1px;
+    }
+    .def-label.other { background: var(--cedow-gold); color: var(--cedow-black); }
+    .strand-src, .source-note { font-size: 0.82rem; color: #6B6B6E; margin: 0.6rem 0 0; }
+    .source-note { margin: -1rem 0 1rem; }
+    div + .source-note { margin: 0.8rem 0 1rem; }
+
+    .glossary-list { margin: 0 0 2rem; border-top: 1px solid var(--cedow-silver); }
+    .glossary-list dt {
+      font-weight: 700;
+      color: var(--cedow-dark-blue);
+      padding-top: 0.8rem;
+    }
+    .glossary-list dd {
+      color: var(--cedow-charcoal);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid #ECEDEF;
+    }
+    .glossary-list dd .src { display: block; font-size: 0.8rem; color: #6B6B6E; margin-top: 0.2rem; }
+
+    /* Lens colour coding */
+    .lens-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      color: #FFFFFF;
+      vertical-align: 2px;
+      margin-left: 0.3rem;
+    }
+    .phase-box > .lens-tag { margin-left: 0; }
+    #stageDetailsBox h4 .lens-tag { display: table; margin: 0.35rem 0 0; }
+    .lens-tag.wr { background: var(--wr); }
+    .lens-tag.lc { background: var(--lc); }
+    .phase-box { border-top: 4px solid; padding-top: 0.8rem; }
+    .phase-box.wr { border-color: var(--wr); }
+    .phase-box.lc { border-color: var(--lc); }
+
+    .colour-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem; margin-top: 0.8rem; font-size: 0.85rem; color: var(--cedow-charcoal); }
+    .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 0.4rem; vertical-align: -2px; }
+    .sw.wr { background: var(--wr); }
+    .sw.lc { background: var(--lc); }
+
+    /* Connecting the Ideas */
+    .parallel-note { background: #F4F6F9; border-left: 5px solid var(--cedow-aqua); border-radius: 6px; padding: 1rem 1.3rem 0.6rem; margin: 0 0 1.4rem; }
+    .parallel-note h3 { margin-top: 0; }
+    .parallel-note ul { margin: 0.4rem 0 0.6rem 1.1rem; }
+    .parallel-note li { margin-bottom: 0.45rem; font-size: 0.95rem; }
+    .parallel-note .source-note { margin: 0.4rem 0 0.4rem; }
+    .connect-panel {
+      border: 2px solid var(--cedow-gold);
+      background: #FFFDF8;
+      border-radius: var(--border-radius);
+      padding: 1.75rem;
+      margin: 1.5rem 0 2rem;
+    }
+    .connect-panel > h3:first-child { margin-top: 0; color: var(--cedow-dark-blue); font-size: 1.4rem; }
+    .connect-panel h4 { margin-top: 1.6rem; }
+
+    .table-scroll { overflow-x: auto; }
+    .lens-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 620px; }
+    .lens-table th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.7rem 0.8rem; font-size: 0.85rem; }
+    .lens-table td { padding: 0.8rem; vertical-align: top; color: var(--cedow-charcoal); border-bottom: 1px solid var(--cedow-silver); }
+    .lens-table tr.wr td { background: var(--wr-tint); }
+    .lens-table tr.lc td { background: var(--lc-tint); }
+    .lens-table tr.wr td:first-child { border-left: 5px solid var(--wr); }
+    .lens-table tr.lc td:first-child { border-left: 5px solid var(--lc); }
+    .muted { font-size: 0.82rem; color: #6B6B6E; }
+
+    .phase-row { display: flex; gap: 1rem; align-items: stretch; margin-top: 1.5rem; }
+    .phase-card { flex: 1; border-radius: 6px; padding: 1.2rem 1.2rem 0.4rem; background: #FFF; border: 2px solid; }
+    .phase-card.wr { border-color: var(--wr); }
+    .phase-card.lc { border-color: var(--lc); }
+    .phase-card ul { margin: 0.6rem 0 0 1.1rem; }
+    .phase-card li { font-size: 0.93rem; margin-bottom: 0.6rem; }
+    .phase-label { display: inline-block; color: #FFF; font-weight: 800; font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 4px; }
+    .phase-card.wr .phase-label { background: var(--wr); }
+    .phase-card.lc .phase-label { background: var(--lc); }
+    .phase-arrow { width: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--cedow-charcoal); }
+    .phase-arrow span { font-size: 2.4rem; color: var(--cedow-gold); line-height: 1; font-weight: 800; }
+    .phase-arrow small { font-size: 0.78rem; line-height: 1.35; }
+
+    .shift-chart { margin-top: 0.5rem; }
+    .shift-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.45rem; }
+    .shift-lbl { width: 100px; font-size: 0.88rem; font-weight: 600; color: var(--cedow-charcoal); flex-shrink: 0; }
+    .shift-bar { flex: 1; display: flex; height: 28px; border-radius: 4px; overflow: hidden; }
+    .shift-bar i { display: flex; align-items: center; justify-content: center; color: #FFF; font-style: normal; font-weight: 700; font-size: 0.82rem; }
+    .shift-bar i.wr { background: var(--wr); }
+    .shift-bar i.lc { background: var(--lc); }
+    .shift-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; font-size: 0.85rem; color: var(--cedow-charcoal); margin-top: 0.6rem; padding-left: calc(100px + 0.8rem); }
+
+    .aims-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 0.8rem; }
+    .aim-card { background: #FFF; border: 1px solid var(--cedow-silver); border-left: 5px solid var(--cedow-gold); border-radius: 6px; padding: 1rem 1.1rem 0.2rem 3.2rem; position: relative; }
+    .aim-num { position: absolute; left: 0.9rem; top: 0.95rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cedow-dark-blue); color: #FFF; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .aim-card h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    .aim-card p { font-size: 0.92rem; margin-bottom: 0.8rem; }
+
+    .nuance { background: #F4F6F9; border-radius: 6px; padding: 1rem 1.2rem; margin-top: 1.5rem; font-size: 0.93rem; color: var(--cedow-charcoal); }
+    .key-message { margin: 1.2rem 0 0; padding: 0.9rem 1.1rem; background: var(--cedow-dark-blue); border-radius: 6px; color: #FFF; }
+    .key-message strong { color: var(--cedow-gold); }
+    .next-hint { margin-top: 1.5rem; padding: 0.8rem 1rem; background: #FFFDF8; border-left: 4px solid var(--cedow-gold); border-radius: 4px; font-size: 0.95rem; }
+
+    /* Science of Reading is / is not */
+    .sor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1rem; }
+    .sor-card { border-radius: 6px; padding: 1.25rem 1.4rem 0.5rem; border: 2px solid; }
+    .sor-card.is { border-color: var(--cedow-aqua); background: #F3FAFA; }
+    .sor-card.isnot { border-color: var(--cedow-gold); background: #FFFBF2; }
+    .sor-card h4 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem; }
+    .sor-card.is h4 { color: var(--cedow-aqua); }
+    .sor-card.isnot h4 { color: #9A5B00; }
+    .sor-icon { width: 1.7rem; height: 1.7rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-size: 0.95rem; font-weight: 800; }
+    .sor-card.is .sor-icon { background: var(--cedow-aqua); }
+    .sor-card.isnot .sor-icon { background: var(--cedow-gold); color: var(--cedow-black); }
+    .sor-card ul { margin: 0.6rem 0 0 1.1rem; }
+    .sor-card li { font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .sor-card li strong { color: var(--cedow-black); }
+    .source-note.sor-src { margin: 0.7rem 0 0; }
+
+    .ref-list { list-style: none; margin-left: 0; }
+    .ref-list li { padding-left: 2rem; text-indent: -2rem; font-size: 0.95rem; margin-bottom: 0.6rem; }
+
+    footer {
+      background: #EAECEF;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--cedow-charcoal);
+      border-top: 1px solid var(--cedow-silver);
+    }
+    footer p { margin: 0; font-size: 0.9rem; }
+
+    /* Mobile */
+    @media (max-width: 720px) {
+      body { padding: 0; }
+      .container { border-radius: 0; }
+      header { padding: 1.5rem; }
+      header h1 { font-size: 1.5rem; }
+      .content-section { padding: 1.5rem; }
+      .step-nav { padding: 1rem 1.5rem 1.5rem; }
+      .tab-btn { min-width: 50%; flex: 1 1 50%; font-size: 0.85rem; }
+      .two-col { flex-direction: column; gap: 0.5rem; }
+      .rope-grid, .classifier-grid { grid-template-columns: 1fr; }
+      .time-literacy, .time-english { font-size: 0.8rem; }
+      .connect-panel { padding: 1.2rem; }
+      .phase-row { flex-direction: column; }
+      .phase-arrow { width: auto; flex-direction: row; gap: 0.6rem; }
+      .phase-arrow span { transform: rotate(90deg); }
+      .aims-grid { grid-template-columns: 1fr; }
+      .svw-grid { grid-template-columns: 1fr 1fr; }
+      .svw-figure { overflow-x: auto; padding: 0.5rem; }
+      .svw-figure svg { min-width: 580px; }
+      .sor-grid { grid-template-columns: 1fr; }
+      .shift-lbl { width: 78px; font-size: 0.8rem; }
+      .shift-legend { padding-left: 0; }
+    }
+
+    /* Print: show the whole module, not just the current tab */
+    @media print {
+      body { background: #FFF; padding: 0; }
+      .container { box-shadow: none; }
+      .nav-tabs, .progress-bar-container, .step-nav, .btn-action, .stage-btn-group,
+      .sort-bank, .sort-footer, #sorterFeedback { display: none !important; }
+      .content-section { display: block !important; padding: 1.5rem 0; page-break-inside: auto; }
+      .content-section + .content-section { page-break-before: always; }
+      .accordion-content, .scenario-answer { display: block !important; }
+      .chev { display: none; }
+      #termPopover { display: none !important; }
+      .term { text-decoration: none; }
+      .connect-panel { page-break-inside: auto; }
+      header, .time-literacy, .time-english, .item-chip, .shift-bar i, .lens-tag, .phase-label, .lens-table th, .lens-table td, .key-message, .aim-num, .sw, .sor-icon, .sor-card, .svw-part, .svw-rope, .process-step span, .cycle-step span, .flw-card h5, .oci-dot {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+    }
+
+    /* Simple View of Writing */
+    .svw-figure { background: #FFFFFF; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1.5rem 0; }
+    .lens-table td { text-align: left; }
+    .mod-note { font-size: 0.85rem; color: #555; border-top: 1px dashed var(--cedow-silver); margin: 0.6rem 0 0; padding-top: 0.5rem; }
+    .build-table td { font-size: 0.86rem; vertical-align: top; min-width: 150px; }
+    .build-table td { vertical-align: top; }
+    .th-pa, .th-cx { padding: 0.4rem 0.5rem; border-radius: 4px; margin-bottom: 0.4rem; font-size: 0.86rem; line-height: 1.4; }
+    .th-pa { background: #E6F4F6; border-left: 4px solid var(--cedow-aqua); }
+    .th-cx { background: #FFF; border: 1px dashed #9AA3AE; border-left: 4px dashed #9AA3AE; color: #444; }
+    .th-pa:last-child, .th-cx:last-child { margin-bottom: 0; }
+    .th-tag { display: block; width: fit-content; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.05rem 0.4rem; border-radius: 3px; margin-bottom: 0.25rem; }
+    .th-tag.pa { background: var(--cedow-aqua); color: #FFF; }
+    .th-tag.cx { background: #EEF0F3; color: #4C4C4E; border: 1px solid #C9CED6; }
+    .th-none { color: #999; text-align: center !important; vertical-align: middle !important; }
+    .th-legend { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; font-size: 0.85rem; margin: 0 0 0.7rem; }
+    .th-legend > span { display: flex; align-items: center; gap: 0.45rem; }
+    .th-legend .th-tag { display: inline-block; margin: 0; }
+    .flip-hint { font-size: 0.9rem; color: #555; margin-bottom: 0.6rem; }
+    .flip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
+    .flip-card { perspective: 1000px; cursor: pointer; border-radius: 6px; outline: none; }
+    .flip-card:focus-visible { box-shadow: 0 0 0 3px var(--cedow-aqua); }
+    .flip-inner { display: grid; transition: transform 0.55s ease; transform-style: preserve-3d; min-height: 230px; }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--cedow-aqua); border-radius: 6px; padding: 0.9rem 1rem; display: flex; flex-direction: column; }
+    .flip-front { justify-content: center; text-align: center; background: linear-gradient(180deg, #F3FAFB, #FFF); }
+    .flip-front h4 { margin: 0.5rem 0 0; font-size: 1.1rem; color: var(--cedow-dark-blue); }
+    .flip-back { transform: rotateY(180deg); }
+    .flip-back p { font-size: 0.9rem; margin: 0.4rem 0 0.5rem; flex: 1; }
+    .flip-cue { margin-top: auto; padding-top: 0.6rem; font-size: 0.75rem; font-weight: 700; color: var(--cedow-aqua); }
+    @media (max-width: 760px) { .flip-grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
+    .svw-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-top: 0.5rem; }
+    .svw-part { border: 2px solid; border-radius: 6px; padding: 0.8rem 0.6rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; background: #FFF; transition: background 0.2s; }
+    .svw-part.tr { border-color: var(--wr); color: var(--wr); }
+    .svw-part.tg { border-color: var(--lc); color: var(--lc); }
+    .svw-part.ef { border-color: var(--cedow-gold); color: #9A5B00; }
+    .svw-part.wm { border-color: var(--cedow-charcoal); color: var(--cedow-charcoal); }
+    .svw-part.tr:hover, .svw-part.tr.active { background: var(--wr); color: #FFF; }
+    .svw-part.tg:hover, .svw-part.tg.active { background: var(--lc); color: #FFF; }
+    .svw-part.ef:hover, .svw-part.ef.active { background: var(--cedow-gold); color: var(--cedow-black); }
+    .svw-part.wm:hover, .svw-part.wm.active { background: var(--cedow-charcoal); color: #FFF; }
+    #svwDetail { background: #FFF; border-left: 5px solid var(--cedow-gold); padding: 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin: 1rem 0; border-radius: 4px; }
+    #svwDetail h4 { margin-top: 0; }
+    #svwDetail p { margin-bottom: 0.5rem; }
+    .svw-rope { background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.5rem 0.8rem; border-radius: 4px; font-size: 0.93rem; }
+    .svw-rope:empty { display: none; }
+    .svw-two { margin-bottom: 1rem; }
+    .band-picker { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: #F4F6F9; border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0 0.3rem; }
+    .band-lbl { font-weight: 800; color: var(--cedow-dark-blue); margin-right: 0.3rem; }
+    .band-btn { font-family: inherit; font-size: 0.95rem; font-weight: 700; padding: 0.45rem 1.1rem; border-radius: 999px; border: 2px solid var(--cedow-dark-blue); background: #FFF; color: var(--cedow-dark-blue); cursor: pointer; }
+    .band-btn.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .band-status { font-size: 0.85rem; color: var(--cedow-charcoal); margin: 0 0 1.2rem; }
+    .band-block[hidden] { display: none; }
+    @media print { .band-block[hidden] { display: block !important; } .band-picker, .band-status { display: none; } }
+    .oral-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0.8rem 0 1rem; }
+    .oral-card { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--cedow-aqua); border-radius: 6px; padding: 0.8rem 1rem 0.4rem; }
+    .oral-when { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-aqua); }
+    .oral-card h4 { margin: 0.2rem 0 0.4rem; font-size: 1rem; color: var(--cedow-dark-blue); }
+    .oral-card p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .oral-points { margin: 0 0 1.2rem 1.1rem; }
+    .oral-points li { margin-bottom: 0.55rem; font-size: 0.95rem; }
+    .oral-points + .source-note { margin: 0.4rem 0 1.4rem; }
+    @media (max-width: 760px) { .oral-grid { grid-template-columns: 1fr; } }
+    .k2-models { display: grid; gap: 1.2rem; margin: 0.6rem 0 1.4rem; }
+    .k2-model { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 5px solid var(--cedow-dark-blue); border-radius: 8px; padding: 1rem 1.2rem 0.8rem; }
+    .k2-model + .k2-model { border-top-color: var(--cedow-aqua); }
+    .k2-head h4 { margin: 0.35rem 0 0.4rem; font-size: 1.25rem; color: var(--cedow-dark-blue); }
+    .k2-tag { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-charcoal); }
+    .km-flow { display: flex; align-items: stretch; gap: 0.4rem; }
+    .km-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; background: #F4F6F9; border-radius: 8px; padding: 0.9rem 0.8rem 0.6rem; }
+    .km-icon { width: 64px; height: 64px; border-radius: 14px; background: var(--cedow-dark-blue); color: #FFF; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
+    .k2-model + .k2-model .km-icon { background: #1E5B8F; }
+    .km-icon svg { width: 40px; height: 40px; }
+    .km-body h5 { margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 800; color: var(--cedow-dark-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+    .km-body h5 span { display: block; font-size: 0.8rem; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--cedow-aqua); }
+    .km-body p { font-size: 0.88rem; line-height: 1.5; margin: 0 0 0.45rem; }
+    .km-body .km-nesa { font-size: 0.8rem; color: var(--cedow-charcoal); }
+    .km-body .km-svw { font-size: 0.78rem; color: #6B6B6E; font-style: italic; }
+    .km-arrow { align-self: center; font-size: 1.4rem; font-weight: 800; color: var(--cedow-gold); }
+    .km-read { display: flex; justify-content: center; }
+    .km-read .km-step { flex: 0 1 46%; }
+    .km-bracket { height: 22px; margin: 0.3rem 8% 0.5rem; border: 3px solid var(--cedow-gold); border-bottom: none; border-radius: 14px 14px 0 0; position: relative; }
+    .km-bracket::before { content: ''; position: absolute; left: 50%; top: -14px; width: 3px; height: 12px; background: var(--cedow-gold); }
+    @media (max-width: 760px) { .km-flow { flex-direction: column; } .km-arrow { transform: rotate(90deg); } .km-read .km-step { flex-basis: 100%; } .km-bracket { display: none; } .km-read { margin-bottom: 0.6rem; } }
+    .process-row, .cycle-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0 1.5rem; counter-reset: none; }
+    .process-step, .cycle-step { flex: 1 1 150px; position: relative; background: #FFF; border: 2px solid var(--cedow-silver); border-radius: 6px; padding: 0.8rem 0.8rem 0.8rem 2.9rem; font-weight: 700; font-size: 0.93rem; color: var(--cedow-dark-blue); display: flex; align-items: center; min-height: 64px; }
+    .process-step span, .cycle-step span { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cedow-gold); color: var(--cedow-black); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .cycle-step { border-color: var(--lc); }
+    .cycle-step span { background: var(--lc); color: #FFF; }
+    .flw-figure img { width: 100%; max-width: 1000px; }
+    .flw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.5rem 0 1.5rem; }
+    .flw-card { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; overflow: hidden; }
+    .flw-card h5 { background: var(--cedow-dark-blue); color: #FFF; font-size: 1rem; padding: 0.55rem 1rem; border-bottom: 4px solid var(--cedow-gold); }
+    .flw-card p { font-size: 0.92rem; margin: 0.7rem 1rem; }
+    .flw-def { font-style: italic; color: var(--cedow-dark-blue) !important; }
+    .oci-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 0.45rem; vertical-align: 0; }
+    .oci-table td:first-child { width: 30%; }
+    .practice-list li { margin-bottom: 0.5rem; }
+    .consider-grid + .source-note, .table-scroll + .source-note, .nesa-figure + .source-note, .practice-list + .source-note { margin: 0.8rem 0 1rem; }
+    .factor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.5rem 0 1rem; }
+    .phase-box.ef { border-color: var(--cedow-gold); }
+    .pw-list li { margin-bottom: 0.35rem; }
+    .consider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+    .consider-card { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--lc); border-radius: 6px; padding: 1rem 1.2rem 0.3rem; }
+    .consider-card h4 { margin-top: 0; }
+    .consider-card ul { margin: 0.4rem 0 0 1.1rem; }
+    .consider-card li { font-size: 0.93rem; margin-bottom: 0.5rem; }
+    .nesa-figure { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1.5rem 0; text-align: center; }
+    .nesa-figure img { max-width: 100%; width: 760px; height: auto; }
+    .nesa-figure figcaption { font-size: 0.82rem; color: var(--cedow-charcoal); margin-top: 0.6rem; text-align: left; }
+    .bda-table td:first-child { width: 22%; white-space: nowrap; }
+    .bda-table { margin-bottom: 0.5rem; }
+    .svw-map-h { margin-top: 2rem; }
+    @media (max-width: 720px) { .factor-grid, .consider-grid, .flw-grid { grid-template-columns: 1fr; } .oci-table td:first-child { width: auto; } .svw-grid { grid-template-columns: 1fr 1fr; } .svw-figure { overflow-x: auto; padding: 0.5rem; } .svw-figure svg { min-width: 580px; } }
+    .svw-map td:first-child { width: 22%; }
+
+    /* Stage guide & metalanguage */
+    .sg-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin: 1rem 0 1.5rem; }
+    .sg-stage { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: 8px; padding: 0.8rem 0.5rem; cursor: pointer; color: var(--cedow-dark-blue); display: flex; flex-direction: column; gap: 0.15rem; align-items: center; }
+    .sg-stage strong { font-size: 1rem; }
+    .sg-stage span { font-size: 0.8rem; color: var(--cedow-charcoal); }
+    .sg-stage:hover { background: #E8EAF6; }
+    .sg-stage.active { background: var(--cedow-dark-blue); color: #FFF; box-shadow: 0 0 0 3px var(--cedow-gold); }
+    .sg-stage.active span { color: #D1D2D4; }
+    .sg-overview { background: var(--cedow-dark-blue); color: #FFF; border-radius: 8px; padding: 1.1rem 1.4rem; }
+    .sg-outs { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    .sg-overview .sg-ohead { font-size: 0.95rem; font-weight: 700; color: #FFF; margin: 0 0 0.35rem; }
+    .sg-overview .sg-ohead::first-line { letter-spacing: 0.2px; }
+    .sg-onote { font-size: 0.88rem; color: var(--cedow-charcoal); margin: 0.55rem 0 0; }
+    .sg-overview h3 span { color: var(--cedow-gold); font-size: 0.95rem; font-weight: 600; margin-left: 0.4rem; }
+    .sg-overview p { color: #E5E7EB; margin: 0; }
+    .sg-h { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; }
+    .sg-num { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--cedow-gold); color: var(--cedow-dark-blue); display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; flex-shrink: 0; }
+    .sg-writes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+    .sg-write { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 5px solid; border-radius: 6px; padding: 0.8rem 1rem 0.2rem; }
+    .sg-write.imaginative { border-top-color: #8E44AD; }
+    .sg-write.informative { border-top-color: var(--lc); }
+    .sg-write.persuasive { border-top-color: #E67E22; }
+    .sg-write.combined { border-top-color: var(--cedow-dark-blue); }
+    .sg-write h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    .sg-write ul { margin: 0 0 0 1.1rem; }
+    .sg-write li { font-size: 0.92rem; margin-bottom: 0.45rem; }
+    .sg-table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 0.9rem; }
+    .sg-table thead th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.6rem 0.7rem; font-size: 0.85rem; white-space: nowrap; }
+    .sg-table thead th .ks-badge { margin-right: 0.3rem; }
+    .sg-table tbody th { text-align: left; vertical-align: top; width: 15%; background: #F4F6F9; color: var(--cedow-dark-blue); padding: 0.7rem; font-size: 0.88rem; border-bottom: 1px solid var(--cedow-silver); }
+    .sg-table td { vertical-align: top; padding: 0.7rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); line-height: 1.55; width: 28%; }
+    .sg-table td:nth-child(2) { background: #FFFBF2; }
+    .sg-table td:nth-child(4) { background: #F3FAFA; font-style: italic; }
+    .sg-mnote { font-size: 0.88rem; }
+    .sg-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.8rem; }
+    .sg-mcat, .ml-group { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .sg-mcat h5, .ml-group h4 { font-size: 0.92rem; color: var(--cedow-dark-blue); margin: 0 0 0.4rem; }
+    .ml-group h4 span { font-weight: 600; color: #6B6B6E; font-size: 0.82rem; }
+    .ml-chip { display: inline-block; border-radius: 999px; padding: 0.12rem 0.6rem; margin: 0.15rem 0.25rem 0.15rem 0; font-size: 0.82rem; font-weight: 600; border: 1.5px solid; background: #FFF; font-family: inherit; }
+    button.ml-chip.term { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
+    .ml-chip.es1 { border-color: #9A5B00; color: #6B4300; background: #FFF6E5; }
+    .ml-chip.s1 { border-color: var(--lc); color: #0F5E6C; background: #E9F6F7; }
+    .ml-chip.s2 { border-color: #5373B6; color: #2C4F95; background: #EEF2FA; }
+    .ml-chip.s3 { border-color: var(--cedow-dark-blue); color: #FFF; background: var(--cedow-dark-blue); }
+    .ml-chip.is-prior { opacity: 0.55; }
+    .sg-mnote .ml-chip.is-prior { border-color: #999; color: #555; }
+    .sg-ml-link { margin-top: 1rem; }
+    .sg-details { margin-top: 2rem; border: 1px solid var(--cedow-silver); border-radius: 8px; background: #F8FAFC; }
+    .sg-details summary { cursor: pointer; padding: 0.9rem 1.2rem; font-weight: 700; color: var(--cedow-dark-blue); }
+    .sg-details-body { padding: 0 1.2rem 1.2rem; }
+    .ml-controls { display: grid; gap: 0.7rem; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1rem 0 0.6rem; }
+    .ml-legend { font-size: 0.85rem; color: var(--cedow-charcoal); margin-bottom: 0.8rem; }
+    .ml-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem; }
+    @media (max-width: 720px) {
+      .sg-stages { grid-template-columns: 1fr 1fr; }
+      .sg-table { min-width: 0; }
+      .sg-table thead { display: none; }
+      .sg-table, .sg-table tbody, .sg-table tr, .sg-table th, .sg-table td { display: block; width: 100% !important; }
+      .sg-table tr { border: 1px solid var(--cedow-silver); border-radius: 6px; margin-bottom: 0.8rem; overflow: hidden; }
+      .sg-table tbody th { background: var(--cedow-dark-blue); color: #FFF; }
+      .sg-table td::before { content: attr(data-label); display: block; font-style: normal; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    }
+    @media print { .sg-stages, .ml-controls, .sg-ml-link { display: none !important; } .sg-details { display: none; } }
+
+    .sg-writelist { columns: 2; column-gap: 2rem; background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 1rem 1.2rem 0.6rem 2.2rem; margin: 0; }
+    .sg-writelist li { break-inside: avoid; margin-bottom: 0.5rem; font-size: 0.94rem; }
+    .sg-writes { display: block !important; }
+    .sg-code { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.15); color: var(--cedow-gold); padding: 0.05rem 0.4rem; border-radius: 3px; margin: 0 0.1rem; }
+    .sg-codes { margin-top: 0.7rem; font-size: 0.82rem; color: #D1D2D4; }
+    .sg-codes .oc-code { margin: 0.15rem 0.15rem 0 0; }
+    .sg-table thead .ks-badge.ks { background: #FFF; color: var(--cedow-dark-blue); }
+    @media (max-width: 720px) { .sg-writelist { columns: 1; } }
+    .cg-list { display: grid; gap: 0.7rem; }
+    .cg { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 8px; overflow: hidden; }
+    .cg-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; background: #F4F6F9; padding: 0.65rem 1rem; border-bottom: 1px solid var(--cedow-silver); }
+    .cg-title { font-weight: 800; color: var(--cedow-dark-blue); font-size: 1rem; }
+    .cg-count { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: var(--cedow-charcoal); }
+    .cg-pts { list-style: disc; margin: 0; padding: 0.75rem 1rem 0.2rem 2.1rem; }
+    .cg-pts li { margin: 0 0 0.6rem; padding-left: 0.2rem; font-size: 0.93rem; line-height: 1.6; transition: opacity 0.2s; }
+    .cg-pts li::marker { color: var(--cedow-dark-blue); }
+    .hl-s { text-decoration: underline; text-decoration-color: var(--lc); text-decoration-thickness: 2.5px; text-underline-offset: 3px; font-weight: 700; color: #0F5E6C; }
+    .hl-k { background: #FFEFC9; color: #5A3800; border-radius: 3px; padding: 0 0.15rem; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .cg-list[data-hl="k"] .hl-s { text-decoration: none; font-weight: inherit; color: inherit; }
+    .cg-list[data-hl="s"] .hl-k { background: none; color: inherit; padding: 0; }
+    .cg-list[data-hl="k"] li:not(.has-k), .cg-list[data-hl="s"] li:not(.has-s) { opacity: 0.4; }
+    .rd-guide { background: #F4F6F9; border-left: 4px solid var(--cedow-dark-blue); border-radius: 6px; padding: 0.8rem 1rem; margin-bottom: 0.9rem; }
+    .rd-guide p { margin: 0 0 0.6rem; font-size: 0.93rem; line-height: 1.6; }
+    .rd-toggle { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .rd-toggle span { font-size: 0.82rem; font-weight: 800; color: var(--cedow-dark-blue); margin-right: 0.2rem; }
+    .rd-toggle button { font-family: inherit; font-size: 0.85rem; font-weight: 700; padding: 0.3rem 0.85rem; border-radius: 999px; border: 1.5px solid var(--cedow-dark-blue); background: #FFF; color: var(--cedow-dark-blue); cursor: pointer; }
+    .rd-toggle button.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .cg-key { margin-top: 0.7rem; }
+    @media (max-width: 720px) { .cg-count { margin-left: 0; } .cg-pts li { font-size: 0.9rem; } }
+    .fp-key { font-size: 0.85rem; color: var(--cedow-charcoal); margin-bottom: 0.6rem; }
+    .fp-table td { width: 42.5% !important; font-style: normal !important; }
+    .fp-table td:nth-child(2) { background: #FFFBF2; }
+    .fp-table td:nth-child(3) { background: #FFF; }
+    .fp-table ul { list-style: none; margin: 0; padding: 0; }
+    .fp-table li { display: flex; gap: 0.5rem; align-items: flex-start; margin: 0 0 0.55rem; font-size: 0.88rem; line-height: 1.5; }
+    .fp-terms { font-size: 0.8rem; color: #6B6B6E; margin-top: 0.3rem; }
+    .fp-terms b { color: #9A5B00; display: block; margin-bottom: 0.15rem; }
+    .fp-terms em { font-style: normal; display: inline-block; background: #FFF6E5; border: 1px solid #F3D59B; color: #6B4300; border-radius: 999px; padding: 0.05rem 0.5rem; margin: 0.15rem 0.25rem 0 0; font-size: 0.76rem; font-weight: 600; }
+    .fp-none { color: #999; margin: 0; }
+    .sg-writelist.one { columns: 1; }
+    /* Knowledge & skills */
+    .ks-key { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0 0.5rem; }
+    .ks-key-item { display: flex; gap: 0.7rem; align-items: flex-start; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.8rem; font-size: 0.9rem; color: var(--cedow-charcoal); line-height: 1.5; }
+    .ks-badge { flex-shrink: 0; display: inline-block; min-width: 3.4rem; text-align: center; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.3px; padding: 0.2rem 0.45rem; border-radius: 4px; color: #FFF; white-space: nowrap; }
+    .ks-badge.k { background: #9A5B00; }
+    .ks-badge.s { background: var(--lc); }
+    .ks-badge.ks { background: var(--cedow-dark-blue); }
+    .ks-badge.ap { background: var(--cedow-gold); color: var(--cedow-dark-blue); }
+    .ks-controls { display: grid; gap: 0.7rem; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; }
+    .ks-ctrl { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+    .ks-ctrl-lbl { width: 90px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-charcoal); }
+    .ks-btns { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .ks-btn { background: #FFF; border: 2px solid var(--cedow-dark-blue); color: var(--cedow-dark-blue); border-radius: 999px; padding: 0.4rem 0.9rem; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
+    .ks-btn:hover { background: #E8EAF6; }
+    .ks-btn.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .ks-summary { margin: 1.2rem 0 0.8rem; }
+    .ks-sum-text { margin-bottom: 0.4rem; color: var(--cedow-dark-blue); }
+    .ks-bar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; background: #EEE; }
+    .ks-bar i { display: flex; align-items: center; justify-content: center; color: #FFF; font-style: normal; font-weight: 700; font-size: 0.8rem; }
+    .ks-bar i.k, .ks-legend i.k { background: #9A5B00; }
+    .ks-bar i.ks, .ks-legend i.ks { background: var(--cedow-dark-blue); }
+    .ks-bar i.s, .ks-legend i.s { background: var(--lc); }
+    .ks-legend { display: flex; gap: 1.2rem; font-size: 0.82rem; color: var(--cedow-charcoal); margin-top: 0.35rem; }
+    .ks-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 0.35rem; vertical-align: -1px; }
+    .ks-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .ks-group { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; overflow: hidden; }
+    .ks-group-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; background: #F4F6F9; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--cedow-silver); }
+    .ks-group-head h4 { margin: 0; font-size: 1rem; }
+    .ks-rope { font-size: 0.72rem; font-weight: 700; color: var(--lc); background: #E0F2F1; padding: 0.15rem 0.5rem; border-radius: 999px; }
+    .ks-group ul { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0.6rem; }
+    .ks-group li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9rem; padding: 0.4rem 0; margin: 0; border-bottom: 1px dashed #E5E7EB; line-height: 1.5; }
+    .ks-group li:last-child { border-bottom: none; }
+    .ks-meta { display: block; margin-top: 0.3rem; font-size: 0.8rem; color: #6B6B6E; }
+    .ks-meta b { color: #9A5B00; font-weight: 700; margin-right: 0.25rem; }
+    .ks-meta em, .ks-metalist em { font-style: normal; display: inline-block; background: #FFF6E5; border: 1px solid #F3D59B; color: #6B4300; border-radius: 999px; padding: 0.05rem 0.5rem; margin: 0.15rem 0.25rem 0 0; font-size: 0.78rem; font-weight: 600; }
+    .ks-metalist { margin-top: 0.9rem; background: #FFFBF2; border: 1px solid #F3D59B; border-left: 5px solid var(--cedow-gold); border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .ks-metalist h4 { margin: 0 0 0.3rem; font-size: 0.95rem; color: #6B4300; }
+    .ks-metalist h4 span { font-weight: 600; font-size: 0.82rem; }
+    .ks-empty { font-style: italic; }
+    @media (max-width: 720px) { .ks-key, .ks-groups { grid-template-columns: 1fr; } .ks-ctrl-lbl { width: 100%; } }
+    @media print { .ks-controls { display: none !important; } }
+
+    /* Syllabus progression */
+    .prog-areas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .prog-area { background: #FFF; border: 2px solid var(--cedow-dark-blue); color: var(--cedow-dark-blue); border-radius: 999px; padding: 0.55rem 1rem; font-weight: 700; font-size: 0.92rem; cursor: pointer; }
+    .prog-area:hover { background: #E8EAF6; }
+    .prog-area.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .prog-intro { background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.9rem 1.1rem; margin-top: 1rem; }
+    .prog-intro p { margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .prog-intro .def { padding: 0; background: none; }
+    .prog-rope { background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.5rem 0.8rem; border-radius: 4px; margin-bottom: 0 !important; }
+    .prog-track { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; margin: 1.2rem 0 0.8rem; }
+    .prog-track::before { content: ''; position: absolute; top: 17px; left: 12.5%; right: 12.5%; height: 4px; background: var(--cedow-silver); border-radius: 2px; }
+    .prog-stage { position: relative; background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0 0.3rem; color: var(--cedow-charcoal); }
+    .prog-stage .dot { width: 30px; height: 30px; border-radius: 50%; background: #FFF; border: 4px solid var(--cedow-silver); z-index: 1; transition: all 0.2s; }
+    .prog-stage .lbl { font-weight: 700; font-size: 0.95rem; }
+    .prog-stage .yrs { font-size: 0.8rem; color: #6B6B6E; }
+    .prog-stage.done .dot { border-color: var(--lc); background: var(--lc); }
+    .prog-stage.active .dot { border-color: var(--cedow-gold); background: var(--cedow-dark-blue); transform: scale(1.15); }
+    .prog-stage.active .lbl { color: var(--cedow-dark-blue); }
+    .prog-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
+    .prog-controls .btn-action { margin: 0; padding: 0.6rem 1rem; font-size: 0.9rem; }
+    .prog-controls .btn-action:disabled { opacity: 0.4; cursor: default; }
+    .prog-detail { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: var(--border-radius); padding: 1.2rem 1.4rem; }
+    .prog-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .prog-head h4 { margin: 0 0 0.6rem; }
+    .prog-count { font-size: 0.82rem; font-weight: 700; color: #6B6B6E; }
+    .prog-outcomes { display: grid; gap: 0.6rem; }
+    .prog-outcome { display: flex; gap: 0.8rem; align-items: flex-start; background: #F8FAFC; border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .prog-outcome p { margin: 0; font-size: 0.95rem; }
+    .prog-new { margin-top: 1rem; background: #FFFBF2; border-left: 5px solid var(--cedow-gold); border-radius: 4px; padding: 0.7rem 0.9rem; font-size: 0.95rem; color: var(--cedow-charcoal); }
+    .prog-compare { margin-top: 1.2rem; }
+    .prog-cols { display: flex; align-items: stretch; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.4rem; }
+    .prog-col { flex: 1 1 0; min-width: 200px; background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--lc); border-radius: 6px; padding: 0.8rem; }
+    .prog-col.current { border-top-color: var(--cedow-gold); box-shadow: 0 0 0 2px var(--cedow-gold) inset; }
+    .prog-col h5 { color: var(--cedow-dark-blue); font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .prog-col .prog-outcome { flex-direction: column; gap: 0.35rem; padding: 0.6rem; margin-bottom: 0.5rem; }
+    .prog-col .prog-outcome p { font-size: 0.86rem; }
+    .prog-arrow { align-self: center; color: var(--cedow-gold); font-weight: 800; font-size: 1.3rem; }
+    @media (max-width: 720px) { .prog-stage .lbl { font-size: 0.8rem; } .prog-stage .yrs { font-size: 0.7rem; } .prog-outcome { flex-direction: column; gap: 0.35rem; } }
+    @media print { .prog-controls, .prog-track, .prog-areas { display: none !important; } .prog-compare { display: block !important; } }
+
+    /* Outcome tables */
+    .oc-note { margin: -0.4rem 0 1rem; }
+    .oc-note a { color: var(--cedow-aqua); }
+    .outcome-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.5rem 0 1rem; min-width: 560px; }
+    .outcome-table th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.55rem 0.7rem; font-size: 0.82rem; }
+    .outcome-table td { padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); vertical-align: top; }
+    .outcome-table tr:nth-child(even) td { background: #F8FAFC; }
+    .oc-stage { white-space: nowrap; font-weight: 600; color: var(--cedow-black) !important; }
+    .oc-code { display: inline-block; white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; font-weight: 700; background: #E8EAF6; color: var(--cedow-dark-blue); padding: 0.15rem 0.45rem; border-radius: 3px; }
+    .rope-tie { font-size: 0.92rem; background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.6rem 0.8rem; border-radius: 4px; margin-bottom: 0; }
+
+    /* Writing module additions */
+    .strand-group { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: var(--lc); margin: 1rem 0 0.2rem; }
+    .strand-card .strand-group:first-of-type { margin-top: 0.5rem; }
+    .rope-link { margin-top: 1.5rem; background: #F4F6F9; border-radius: 6px; padding: 1rem; }
+    .rope-link h5 { font-size: 0.95rem; color: var(--cedow-dark-blue); margin-bottom: 0.5rem; }
+    .rope-link table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .rope-link th { text-align: left; background: var(--cedow-dark-blue); color: #FFF; padding: 0.4rem 0.5rem; }
+    .rope-link td { padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); vertical-align: top; }
+    .rope-link td:first-child { font-weight: 700; color: var(--cedow-black); }
+    .rope-link p { font-size: 0.85rem; margin: 0.6rem 0 0; }
+    #step3 .nuance { margin-top: 2rem; }
+  
+    .stage-hint, .sw-hint { font-size: 0.95rem; font-weight: 700; color: var(--cedow-dark-blue); background: #EEF2F8; border: 1px dashed var(--cedow-dark-blue); border-radius: 6px; padding: 0.45rem 0.8rem; margin: 0.8rem 0 0.4rem; }
+    .sw-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0; }
+    .sw-tab { font: inherit; font-weight: 700; font-size: 0.92rem; padding: 0.55rem 1rem; border: 2px solid var(--cedow-dark-blue); border-bottom: none; border-radius: 8px 8px 0 0; background: #F4F5F7; color: var(--cedow-dark-blue); cursor: pointer; }
+    .sw-tab.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .sw-tab.act.active { background: #3F8F9E; border-color: #3F8F9E; } .sw-tab.act { border-color: #3F8F9E; color: #2C6B76; }
+    .sw-tab.bld.active { background: #E8902E; border-color: #E8902E; } .sw-tab.bld { border-color: #E8902E; color: #8A4B08; }
+    .sw-tab.act.active, .sw-tab.bld.active { color: #FFF; }
+    .sw-panel { border: 2px solid var(--cedow-dark-blue); border-radius: 0 8px 8px 8px; padding: 0.6rem 1.1rem 1rem; margin-bottom: 1.4rem; }
+    .sw-panel.act { border-color: #3F8F9E; } .sw-panel.bld { border-color: #E8902E; }
+    .nesa-q { margin: 0.6rem 0 1rem; padding: 0.6rem 0.9rem; background: #EEF2F8; border-left: 4px solid var(--cedow-dark-blue); border-radius: 4px; font-size: 0.95rem; }
+    .nesa-q .src { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    .code-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; color: #FFF; background: var(--cedow-dark-blue); border-radius: 3px; padding: 0 0.35rem; margin-right: 0.35rem; white-space: nowrap; }
+    .code-tag.w { background: #8A4B08; } .code-tag.o { background: #2C6B76; }
+    .cycle { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0.5rem; margin: 1rem 0 1.4rem; }
+    .cycle .node { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: 10px; padding: 0.7rem; text-align: center; font-weight: 700; color: var(--cedow-dark-blue); }
+    .cycle .node small { display: block; font-weight: 400; color: #444; margin-top: 0.3rem; font-size: 0.82rem; }
+    .cycle .arr { font-size: 1.6rem; color: var(--cedow-aqua); font-weight: 800; }
+    .cycle-note { text-align: center; font-size: 0.88rem; color: #555; margin: -0.8rem 0 1.2rem; }
+    .vs { width: 100%; border-collapse: collapse; margin: 0.6rem 0 1.2rem; font-size: 0.93rem; }
+    .vs th { padding: 0.6rem; color: #FFF; text-align: left; } .vs th.a { background: #3F8F9E; } .vs th.b { background: #E8902E; } .vs th.q { background: var(--cedow-dark-blue); width: 18%; }
+    .vs td { padding: 0.55rem 0.6rem; border-bottom: 1px solid #DDD; vertical-align: top; } .vs td:first-child { font-weight: 700; color: var(--cedow-dark-blue); }
+    .decide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0.6rem 0 1.2rem; }
+    .decide button { font: inherit; text-align: left; cursor: pointer; border: 2px solid var(--cedow-silver); background: #FFF; border-radius: 8px; padding: 0.7rem 0.9rem; }
+    .decide button strong { display: block; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    .decide button.on { border-color: var(--cedow-dark-blue); background: #EEF2F8; }
+    .decide-out { border-left: 5px solid var(--cedow-aqua); background: #F3FAFB; padding: 0.7rem 1rem; border-radius: 4px; margin-bottom: 1.2rem; min-height: 2.6rem; }
+    .strat-src { font-size: 0.78rem; color: #6B6B6E; margin: 0.4rem 0 0; }
+    @media (max-width: 760px) { .cycle { grid-template-columns: 1fr; } .cycle .arr { transform: rotate(90deg); text-align: center; } .decide { grid-template-columns: 1fr; } }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0.8rem 0 1.4rem; }
+    .split .side { border-radius: 10px; padding: 0.9rem 1.1rem; border: 2px solid; }
+    .split .lit { border-color: #3F8F9E; background: #F3FAFB; } .split .eng { border-color: #E8902E; background: #FFF8EE; }
+    .split h4 { margin: 0 0 0.4rem; font-size: 1.1rem; } .split .lit h4 { color: #2C6B76; } .split .eng h4 { color: #8A4B08; }
+    .split ul { margin: 0.3rem 0 0; padding-left: 1.1rem; } .split li { margin-bottom: 0.3rem; }
+    .fa-chip { display: inline-block; font-size: 0.8rem; font-weight: 700; border-radius: 14px; padding: 0.15rem 0.6rem; margin: 0.15rem 0.2rem 0.15rem 0; color: #FFF; }
+    .fa-chip.lit { background: #3F8F9E; } .fa-chip.eng { background: #E8902E; } .fa-chip.both { background: var(--cedow-dark-blue); }
+    .rat p { margin: 0 0 0.7rem; padding: 0.6rem 0.9rem; border-radius: 6px; background: #FFF; border: 1px solid #E2E5EA; position: relative; }
+    .rat p.hl-lit { border-left: 6px solid #3F8F9E; background: #F3FAFB; } .rat p.hl-eng { border-left: 6px solid #E8902E; background: #FFF8EE; }
+    .rat .lab { display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #FFF; border-radius: 3px; padding: 0 0.4rem; margin-right: 0.4rem; }
+    .rat .hl-lit .lab { background: #3F8F9E; } .rat .hl-eng .lab { background: #E8902E; }
+    .hub { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; align-items: stretch; margin: 0.8rem 0; }
+    .hub .core { grid-column: 2; grid-row: 2 / span 2; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: var(--cedow-dark-blue); border: 3px solid var(--cedow-dark-blue); border-radius: 50%; aspect-ratio: 1; max-width: 220px; justify-self: center; width: 100%; }
+    .hub button { font: inherit; font-weight: 700; cursor: pointer; border: 2px solid #E8902E; background: #F8D9A8; color: #3A2A10; border-radius: 10px; padding: 0.7rem; min-height: 4rem; }
+    .hub button.on { background: #E8902E; color: #FFF; }
+    .hub-out { border: 2px solid var(--cedow-dark-blue); border-radius: 8px; padding: 0.8rem 1.1rem; margin-bottom: 1.4rem; }
+    .hub-out .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hub-out h5 { margin: 0 0 0.3rem; font-size: 0.95rem; } .hub-out .l h5 { color: #2C6B76; } .hub-out .e h5 { color: #8A4B08; }
+    @media (max-width: 760px) { .split, .hub-out .two { grid-template-columns: 1fr; } .hub { grid-template-columns: 1fr 1fr; } .hub .core { grid-column: 1 / span 2; grid-row: auto; max-width: 160px; font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <p>Catholic Education Diocese of Wollongong — Professional Learning Module</p>
+    <h1>Literacy and English: Understanding the Difference</h1>
+  </header>
+  <div class="progress-bar-container" role="progressbar" aria-label="Module progress" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><div class="progress-bar" id="progressBar"></div></div>
+  <nav class="nav-tabs" role="tablist" aria-label="Module sections">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="step1" data-step="1">1. Literacy and English</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step2" data-step="2">2. Literacy: Foundational Skills</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step3" data-step="3">3. English: The Discipline</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step4" data-step="4">4. Working Together</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step5" data-step="5">5. Planning with Purpose</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step6" data-step="6">6. References</button>
+  </nav>
+
+  <section id="step1" class="content-section active" role="tabpanel">
+    <h2>1. Literacy and English: What's the Difference?</h2>
+    <p>Literacy and English are closely connected, but they are not the same thing. Being clear about the difference helps teachers plan for both: the systematic teaching of foundational skills, and the rich, conceptual study of language and literature.</p>
+    <div class="split">
+      <div class="side lit"><h4>Literacy</h4>
+        <p>Literacy is the fundamental capability to interpret, evaluate and create meaning across a diverse range of oral, print, visual and digital texts. Its core knowledge and skills are explicitly developed within the English learning area, but literacy is a dynamic and flexible practice reinforced across all disciplines. It involves the purposeful use of language (listening, speaking, reading, viewing and writing) to learn effectively, communicate confidently and participate productively in society.</p></div>
+      <div class="side eng"><h4>English</h4>
+        <p>English is the study of language and literature through which students learn to interact with the world. The 2022 syllabus takes a conceptual approach, moving from foundational “code-breaking” in the early years to sophisticated critical analysis in later stages. English is not just about reading: it is the study of texts with enduring value, and it develops confident communicators, critical and imaginative thinkers, and lifelong learners.</p></div>
+    </div>
+<blockquote class="nesa-q"><span class="src">NESA, English K–10 Syllabus (2022), overview</span>“The organisation of the syllabus supports the development of early literacy knowledge and skills, while continuing to acknowledge the importance of learning about and enjoying literature.”</blockquote>
+
+    <h3>What the Rationale Says</h3>
+    <p>The syllabus rationale names both. One paragraph is about <strong>literacy</strong>; the next is about <strong>English</strong>.</p>
+    <div class="rat">
+      <p>“Language and text shape our understanding of ourselves and our world. This allows us to relate with others, and contributes to our intellectual, social and emotional development. In English K–10, students study language in its various textual forms, which develop in complexity, to understand how meaning is shaped, conveyed, interpreted, and reflected.”</p>
+      <p>“Students engage with literature from Australia, including the rich voices of Aboriginal and Torres Strait Islander Peoples, and from across the world. These texts communicate in distinctive ways and are shaped by lived experiences, knowledge, cultures, and connections. By exploring historic and contemporary texts, representative of a range of cultural and social perspectives, students broaden their experiences and become empowered to express their identities, personal values and ethics.”</p>
+      <p class="hl-lit"><span class="lab">Literacy</span>“Students develop foundational literacy skills in the early years and progressively build on these skills. This enables them to learn about and control language in a range of increasingly sophisticated contexts.”</p>
+      <p class="hl-eng"><span class="lab">English</span>“Through interrelated practices and experiences in understanding and creating texts, students learn about the power, purpose, value and art of English. The development of these interconnected skills and understandings supports students to become confident communicators, critical and imaginative thinkers, and informed and active participants in society.”</p>
+    </div>
+    <p class="source-note">NESA, English K–10 Syllabus (2022), Rationale (updated with the release of the 3–10 outcomes and content).</p>
+    <h3>Literature: The Heart of English</h3>
+<blockquote class="nesa-q"><span class="src">NESA, English K–10 Syllabus (2022)</span>“Literature is defined as a body of work that has enduring personal, social, cultural or aesthetic value. It comprises a dynamic and evolving range of fiction and nonfiction texts from diverse contemporary, historical and cultural contexts.”</blockquote>
+
+    <p class="key-message"><strong>Key message:</strong> literacy is the capability to make and interpret meaning, built on foundational skills and used in every subject. English is the discipline: the study of language and literature that develops that capability and goes far beyond it.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 2 looks at literacy and the foundational skills.</p>
+  </section>
+
+  <section id="step2" class="content-section" role="tabpanel">
+    <h2>2. Literacy: The Foundational Skills</h2>
+    <p>Early literacy skills and knowledge form the foundation for learning in English. These foundational skills are interrelated and often develop in parallel. In the syllabus they are taught through these focus areas:</p>
+    <p><span class="fa-chip lit">Phonological awareness</span><span class="fa-chip lit">Print conventions (Early Stage 1)</span><span class="fa-chip lit">Phonic knowledge</span><span class="fa-chip lit">Spelling</span><span class="fa-chip lit">Handwriting</span><span class="fa-chip lit">Reading fluency</span></p>
+    <p>Most of these are <strong>constrained skills</strong>: there is a finite set of knowledge to master, such as the letter–sound correspondences or letter formations, and students can master them completely (Paris, 2005).</p>
+<div class="consider-grid">
+<div class="consider-card"><h4>Phonological awareness and phonic knowledge</h4><p>Support understanding of the alphabetic code, to develop decoding (reading) and encoding (spelling) skills.</p></div>
+<div class="consider-card"><h4>Handwriting and spelling</h4><p>The transcription skills that support writing fluency. When they are automatic, they reduce cognitive load, freeing attention for composing.</p></div>
+<div class="consider-card"><h4>Reading fluency</h4><p>Automaticity and prosody form the bridge from word recognition to reading comprehension (Rasinski, 2012). NESA describes fluency as “the bridge from phonics to comprehension”.</p></div>
+<div class="consider-card"><h4>Print conventions (Early Stage 1)</h4><p>Taught in Early Stage 1. Understandings about how print works, which once mastered need no further teaching. NESA: “Once students have developed an understanding of print conventions, further teaching is not required.”</p></div>
+</div>
+
+    <h3>How Foundational Skills Are Taught</h3>
+    <p>Teaching for foundational skills is <strong>systematic, cumulative and explicit</strong>, including teaching students to understand and use the alphabetic code. It should:</p>
+<div class="consider-grid">
+<div class="consider-card"><h4>Interrelated approach</h4><p>The focus areas of Phonological awareness, Phonic knowledge, Spelling, Handwriting and Reading fluency, with Print conventions in Early Stage 1, are taught in parallel, in an interrelated way, rather than one after another. Learning in one focus area strengthens and is applied in the others.</p></div>
+<div class="consider-card"><h4>Use whole class, small group and targeted teaching</h4><p>Explicit whole-class teaching, then small-group and targeted instruction informed by assessment, so every student masters the skills.</p></div>
+<div class="consider-card"><h4>Use aligned resources</h4><p>All resources must align to both the syllabus and the instructional sequence, so students have authentic and purposeful opportunities to practise and apply what they have been taught. For example, decodable texts, magnetic letters, sentence strips and Elkonin boxes are used only with the GPCs and skills already taught. See the Phonic Knowledge and Spelling modules for the CEDoW instructional models.</p></div>
+</div>
+<blockquote class="nesa-q"><span class="src">NESA, Additional teaching advice, Phonic knowledge, Early Stage 1</span>“In Early Stage 1 it is essential to teach the initial phonics code: explicitly, systematically, sequentially, cumulatively.”</blockquote>
+
+    <h3>Literacy Across the Curriculum</h3>
+    <p>Literacy is not confined to English. Students use their literacy to learn in every subject, and every subject has its own literacy demands, from reading a science procedure to writing a historical recount.</p>
+<blockquote class="nesa-q"><span class="src">NESA, NSW Curriculum, Capabilities and priorities</span>“Applying literacy knowledge and skills across the curriculum can enrich the study of all learning areas and help students develop a broader and deeper understanding of literacy.”</blockquote>
+
+    <p class="key-message"><strong>Key message:</strong> foundational literacy skills are constrained, masterable and taught systematically, cumulatively and explicitly, so that every student can access the rest of English and the whole curriculum.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 3 looks at English as a discipline.</p>
+  </section>
+
+  <section id="step3" class="content-section" role="tabpanel">
+    <h2>3. English: The Discipline</h2>
+    <p>English develops deep, discipline-specific knowledge and understanding through <strong>explicit teaching of knowledge and skill</strong>, alongside purposeful and intentional opportunities to <strong>explore, analyse, experiment with and enjoy quality literature</strong> through the study of English textual concepts. It is taught through these focus areas:</p>
+    <p><span class="fa-chip eng">Understanding and responding to literature</span><span class="fa-chip eng">Reading comprehension</span><span class="fa-chip eng">Creating written texts</span><span class="fa-chip eng">Vocabulary</span><span class="fa-chip both">Oral language and communication</span></p>
+    <p>Oral language and communication forms a solid foundation for communication and underpins all learning, in both foundational skills and English. These focus areas are <strong>unconstrained</strong>: knowledge of vocabulary, comprehension and literature keeps growing throughout life (Paris, 2005).</p>
+<div class="consider-grid">
+<div class="consider-card"><h4>Oral language and communication</h4><p>Talk about texts, ideas and learning: discussing literature, building vocabulary in use, planning writing orally and presenting to audiences.</p></div>
+<div class="consider-card"><h4>Reading comprehension and Vocabulary</h4><p>Developed by listening to, reading and responding to literature, as well as through explicit teaching.</p></div>
+<div class="consider-card"><h4>Understanding and responding to literature</h4><p>Provides opportunities to think critically about how meaning is shaped, conveyed, interpreted and reflected in texts.</p></div>
+<div class="consider-card"><h4>Creating written texts</h4><p>Provides opportunities for planning, creating and revising texts for different purposes and audiences.</p></div>
+</div>
+
+    <h3>A Conceptual Approach</h3>
+    <p>The syllabus takes a conceptual approach to English, through a focus on textual concepts and quality literature. In K–6, the Understanding and responding to literature content is organised around concepts such as context, narrative, character, imagery, symbol and connotation, perspective, argument, genre and theme. Concepts act as lenses for studying literature, so students move beyond basic comprehension to analyse, experiment with and appreciate increasingly complex texts.</p>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Understanding and responding to literature, Stages 2 and 3</span>Concepts in texts “can be used as lenses through which to study literature.” “Text selection for the instructional purpose is important. For example, a poem may lend itself to teaching the concepts of imagery, symbol and connotation, while an advertisement or speech may be suitable for teaching the concepts of argument and authority.”</blockquote>
+
+    <p class="source-note">The NSW Department of Education's English textual concepts resources, developed with the English Teachers Association NSW, support teachers to plan for these concepts.</p>
+    <h3>How English Is Taught</h3>
+<div class="consider-grid">
+<div class="consider-card"><h4>Explicit teaching through gradual release</h4><p>Teachers model, then share and guide, then students work independently: I do, we do, you do (Pearson and Gallagher, 1983). NESA describes a cycle of “modelled teaching, shared teaching, guided teaching and independent learning” for writing in Years 3–6.</p></div>
+<div class="consider-card"><h4>Quality literature and multimodal texts</h4><p>Resources include quality literature, multimodal texts, and planning and writing scaffolds. “Students benefit from their teacher reading literature to them that is more complex in structure, language and visual elements than the texts they may read independently.”</p></div>
+<div class="consider-card"><h4>Rich, purposeful writing</h4><p>Embeds rich and purposeful opportunities for students to plan, compose and revise written texts for a range of purposes and audiences.</p></div>
+<div class="consider-card"><h4>Meaningful connections</h4><p>Supports meaningful connections between syllabus focus areas, outcomes and content, so students apply what they learn in one focus area to another.</p></div>
+</div>
+
+    <p class="key-message"><strong>Key message:</strong> English is a discipline with its own concepts and body of knowledge. It combines explicit teaching with the intentional study and enjoyment of quality literature.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 4 shows how literacy and English work together.</p>
+  </section>
+
+  <section id="step4" class="content-section" role="tabpanel">
+    <h2>4. How Literacy and English Work Together</h2>
+    <p>Literacy and English are not two separate programs competing for time. Foundational skills give students access to texts; the study of English gives those skills purpose and depth. Both are needed from the first day of school.</p>
+    <div class="split">
+      <div class="side lit"><h4>Foundational skills (literacy)</h4>
+        <p><span class="fa-chip lit">Phonological awareness</span><span class="fa-chip lit">Print conventions (Early Stage 1)</span><span class="fa-chip lit">Phonic knowledge</span><span class="fa-chip lit">Spelling</span><span class="fa-chip lit">Handwriting</span><span class="fa-chip lit">Reading fluency</span></p>
+        <ul><li>Constrained: finite and masterable</li><li>Systematic, cumulative and explicit</li><li>Whole class, small group and targeted</li><li>Resources aligned to the syllabus and instructional sequence</li><li>Goal: accuracy and automaticity</li></ul></div>
+      <div class="side eng"><h4>Conceptual understandings (English)</h4>
+        <p><span class="fa-chip eng">Understanding and responding to literature</span><span class="fa-chip eng">Reading comprehension</span><span class="fa-chip eng">Creating written texts</span><span class="fa-chip eng">Vocabulary</span></p>
+        <ul><li>Unconstrained: grow throughout life</li><li>Explicit teaching through gradual release, and textual concepts</li><li>Whole class, with guided and independent work</li><li>Quality literature, multimodal texts, planning and writing scaffolds</li><li>Goal: deep understanding, critical and creative thinking</li></ul></div>
+    </div>
+    <p style="text-align:center;margin:-0.6rem 0 1.2rem;"><span class="fa-chip both">Oral language and communication</span> underpins both: it forms a solid foundation for communication and underpins all learning.</p>
+<blockquote class="nesa-q"><span class="src">NESA, English K–10 Syllabus (2022), overview</span>“Many connections exist between the focus areas in English. Knowledge of and skills for focus areas often develop in an interrelated manner and are therefore best addressed in parallel.” “Focus areas should not be interpreted as hierarchical or time bound, as instructional priorities will be informed by learner needs. Across a stage of learning all focus areas need to be taught.”</blockquote>
+
+    <h3>Reciprocity and Connected Content</h3>
+    <p class="flip-hint">Select each card to see how the two connect.</p>
+    <div class="flip-grid">
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Decoding meets meaning. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Decoding meets meaning</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Decoding meets meaning</h4><p>Phonic knowledge lets students read the words; vocabulary and background knowledge let them understand them. Reading comprehension needs both.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Spelling meets vocabulary. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Spelling meets vocabulary</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Spelling meets vocabulary</h4><p>NESA: “Teaching of spelling and vocabulary (including exploring word structures and how spelling can alter meaning) should be closely linked.”</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Transcription meets composition. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Transcription meets composition</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Transcription meets composition</h4><p>Automatic handwriting and spelling free working memory, so students can focus on ideas, structure and language when creating texts.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Fluency meets literature. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Fluency meets literature</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Fluency meets literature</h4><p>Fluent reading lets students attend to meaning. Hearing literature read aloud models the prosody students learn to use themselves.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Apply the gradual release to build mastery and independence. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Apply the gradual release to build mastery and independence</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Apply the gradual release to build mastery and independence</h4><p>In both foundational skills and English, teachers model, then share and guide, before students work independently. For foundational skills this builds accuracy and automaticity; for English, read-alouds and shared reading of complex literature give access to concepts and vocabulary until students can read and respond independently.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Literacy for every subject. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Literacy for every subject</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Literacy for every subject</h4><p>Literacy built in English lets students learn in Science, HSIE and every other area, and those subjects in turn build the knowledge students bring to English.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+
+    </div>
+    <div class="nuance"><strong>A common misconception.</strong> “Literacy block” and “English” are sometimes used as if they were the same thing. A program that teaches only foundational skills is not yet teaching English; a program that studies literature without systematic foundational teaching leaves many students unable to access it. The syllabus requires both.</div>
+    <p class="key-message"><strong>Key message:</strong> teach foundational skills systematically and the discipline of English conceptually, in parallel, connected by oral language, and linked through connected content.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 5 shows how purpose drives planning for each.</p>
+  </section>
+
+  <section id="step5" class="content-section" role="tabpanel">
+    <h2>5. Planning with Purpose</h2>
+    <p>Planning begins with the <strong>purpose of instruction</strong>. Is the lesson to <strong>explicitly teach foundational literacy</strong> knowledge and skills, <strong>or</strong> to teach <strong>subject-specific knowledge in English</strong>? That purpose then influences every other planning decision:</p>
+    <ul>
+      <li>text selection</li><li>the sequence of learning</li><li>the use of High Impact Teaching Strategies (HITS)</li><li>resource selection</li><li>evidence-based teaching practices</li><li>the opportunities students have to transfer and apply their learning</li><li>what mastery looks like</li>
+    </ul>
+<p class="sw-hint">&#9758; Select an element to see how the purpose of instruction shapes it: explicitly teaching foundational literacy, or teaching subject-specific knowledge in English.</p><div class="hub"><div class="core" style="grid-row:2 / span 2;">Purpose</div><button data-h="text" style="grid-column:1;grid-row:1">Text selection</button><button data-h="seq" style="grid-column:3;grid-row:1">Sequence of learning</button><button data-h="hits" style="grid-column:1;grid-row:2">Use of HITS</button><button data-h="res" style="grid-column:3;grid-row:2">Resource selection</button><button data-h="ebp" style="grid-column:1;grid-row:3">Evidence-based teaching practices</button><button data-h="xfer" style="grid-column:3;grid-row:3">Opportunities to transfer and apply</button><button data-h="mast" style="grid-column:2;grid-row:4">What mastery looks like</button></div><div class="hub-out" id="hubOut" aria-live="polite"><p style="margin:0">Select an element above.</p></div><script>const HUB = {
+  text: {t: 'Text selection', l: 'Decodable texts that closely match the sequence of taught GPCs, used until students have mastered the code.', e: "Quality literature and multimodal texts chosen for the concept being taught, read aloud when they are beyond students' independent reading level."},
+  seq: {t: 'Sequence of learning', l: "A systematic, cumulative sequence, such as NESA's suggested instructional sequences for Phonic knowledge and Spelling, reviewed in the order taught.", e: 'Units built around textual concepts and quality texts, sequenced so concepts are revisited and deepened across the year and stages.'},
+  hits: {t: 'Use of HITS', l: 'Explicit teaching, worked examples, multiple exposures, questioning and feedback in short, sharp, daily lessons.', e: 'Setting goals, explicit teaching through gradual release, collaborative learning, metacognitive strategies and rich questioning about texts.'},
+  res: {t: 'Resource selection', l: 'Resources aligned to the syllabus and the instructional sequence: magnetic letters, letter tiles, Elkonin boxes, mini whiteboards, sentence strips and GPC cards, used only with what has been taught.', e: 'Quality literature, mentor texts, planning and writing scaffolds, graphic organisers and word banks, selected for the concept and purpose of the unit.'},
+  ebp: {t: 'Evidence-based teaching practices', l: 'Systematic synthetic phonics, and the CEDoW Phonics and Spelling Instructional Models.', e: 'Rich talk about literature, guided discussion, comprehension strategy instruction, modelled and shared writing.'},
+  xfer: {t: 'Opportunities to transfer and apply', l: "Applying taught GPCs in decodable texts, dictation and students' own writing.", e: 'Creating texts for real purposes and audiences, and applying concepts when reading and writing across the curriculum.'},
+  mast: {t: 'What mastery looks like', l: 'Constrained skills can and should be mastered: accuracy first, then automaticity, checked through regular assessment.', e: 'Understanding deepens over time: students apply concepts to increasingly complex texts rather than mastering a finite set.'}
+};</script>
+    <h3>Planning and Programming</h3>
+<div class="consider-grid">
+<div class="consider-card"><h4>Programming foundational skills</h4><p>Plan dedicated, systematic lessons for the constrained skills, following an instructional sequence and grouping students by assessed need. Oral language and communication underpins this learning.</p></div>
+<div class="consider-card"><h4>Programming English</h4><p>Plan units around quality literature and textual concepts, combining explicit teaching with exploration, analysis and experimentation, and connecting Reading comprehension, Vocabulary, Understanding and responding to literature, Creating written texts, and Oral language and communication.</p></div>
+</div>
+
+    <p class="key-message"><strong>Key message:</strong> start with purpose. Whether you are explicitly teaching foundational literacy or subject-specific knowledge in English determines your texts, sequence, HITS, resources, teaching practices, opportunities to transfer and apply, and what mastery looks like.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 6 lists the references used in this module.</p>
+  </section>
+
+  <section id="step6" class="content-section" role="tabpanel">
+    <h2>6. References</h2>
+    <ul class="ref-list">
+      <li>NSW Department of Education. (n.d.). <em>English textual concepts</em>. NSW Department of Education, with the English Teachers Association NSW.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 (2022): Additional teaching advice. Early Stage 1: Phonic knowledge</em>. NESA.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 Syllabus</em> [Rationale, Overview and Glossary]. NSW Curriculum website.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 Syllabus: Teaching advice (Early Stage 1 to Stage 3)</em>. NSW Curriculum website.</li>
+      <li>NSW Education Standards Authority. (n.d.). <em>Capabilities and priorities</em>. NSW Curriculum website.</li>
+      <li>Paris, S. G. (2005). Reinterpreting the development of reading skills. <em>Reading Research Quarterly, 40</em>(2), 184–202. https://doi.org/10.1598/RRQ.40.2.3</li>
+      <li>Pearson, P. D., &amp; Gallagher, M. C. (1983). The instruction of reading comprehension. <em>Contemporary Educational Psychology, 8</em>(3), 317–344.</li>
+      <li>Rasinski, T. V. (2012). Why reading fluency should be hot! <em>The Reading Teacher, 65</em>(8), 516–522. https://doi.org/10.1002/TRTR.01077</li>
+      <li>State of Victoria (Department of Education and Training). (2020). <em>High impact teaching strategies: Excellence in teaching and learning</em> (Rev. ed.). Licensed under CC BY 4.0.</li>
+    </ul>
+    <p class="source-note">NESA syllabus text and teaching advice are quoted exactly. The descriptions of literacy and English draw on CEDoW professional learning materials.</p>
+  </section>
+
+  <div class="step-nav">
+    <button class="btn-action" id="prevBtn">← Previous</button>
+    <span id="stepCounter">Step 1 of 6</span>
+    <button class="btn-action" id="nextBtn">Next →</button>
+  </div>
+  <footer><p>Catholic Education Diocese of Wollongong — Literacy and English Professional Learning Module</p></footer>
+</div>
+
+<script>
+(function(){
+  const N = 6; let cur = 1;
+  const tabs = document.querySelectorAll('.tab-btn'), secs = document.querySelectorAll('.content-section');
+  function show(n){ cur = n;
+    tabs.forEach(t => { const on = +t.dataset.step === n; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+    secs.forEach(s => s.classList.toggle('active', s.id === 'step' + n));
+    document.getElementById('stepCounter').textContent = 'Step ' + n + ' of ' + N;
+    document.getElementById('progressBar').style.width = (n / N * 100) + '%';
+    document.getElementById('prevBtn').disabled = n === 1; document.getElementById('nextBtn').disabled = n === N;
+    window.scrollTo({top: 0, behavior: 'smooth'}); }
+  tabs.forEach(t => t.addEventListener('click', () => show(+t.dataset.step)));
+  document.getElementById('prevBtn').addEventListener('click', () => cur > 1 && show(cur - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => cur < N && show(cur + 1));
+  document.querySelectorAll('.flip-card').forEach(c => { const f = () => { const on = c.classList.toggle('flipped'); c.setAttribute('aria-pressed', on);
+      c.querySelector('.flip-front').setAttribute('aria-hidden', on); c.querySelector('.flip-back').setAttribute('aria-hidden', !on); };
+    c.addEventListener('click', f); c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f(); } }); });
+  document.querySelectorAll('.hub button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.hub button').forEach(x => x.classList.toggle('on', x === b));
+    const d = HUB[b.dataset.h];
+    document.getElementById('hubOut').innerHTML = '<h4 style="margin-top:0">' + d.t + '</h4><div class="two"><div class="l"><h5>Foundational skills (literacy)</h5><p>' + d.l + '</p></div><div class="e"><h5>English</h5><p>' + d.e + '</p></div></div>'; }));
+  show(1);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Background Knowledge | CEDoW</title>
+<style>
+    :root {
+      --cedow-dark-blue: #0D2C6B;
+      --cedow-white: #FFFFFF;
+      --cedow-silver: #D1D2D4;
+      --cedow-black: #231F20;
+      --cedow-aqua: #188296;
+      --cedow-charcoal: #4C4C4E;
+      --cedow-gold: #FBAF3F;
+      --bg-light: #F4F6F9;
+      --wr: var(--cedow-dark-blue);   /* Transcription · Constrained · Literacy */
+      --lc: var(--cedow-aqua);        /* Composition · Unconstrained · English */
+      --wr-tint: #E8EAF6;
+      --lc-tint: #E0F2F1;
+      --success: #2E7D32;
+      --error: #C62828;
+      --border-radius: 8px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--cedow-black);
+      line-height: 1.6;
+      padding: 1rem;
+    }
+
+    button { font-family: inherit; }
+
+    :focus-visible { outline: 3px solid var(--cedow-gold); outline-offset: 2px; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--cedow-dark-blue);
+      color: var(--cedow-white);
+      padding: 2rem;
+      border-bottom: 5px solid var(--cedow-gold);
+    }
+
+    header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.25; }
+
+    header p {
+      color: var(--cedow-silver);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-container { background: #E5E7EB; height: 6px; width: 100%; }
+
+    .progress-bar {
+      background: var(--cedow-aqua);
+      height: 100%;
+      width: 6.67%;
+      transition: width 0.3s ease;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      background: #EAECEF;
+      border-bottom: 1px solid var(--cedow-silver);
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 150px;
+      padding: 1rem 0.5rem;
+      background: none;
+      border: none;
+      border-top: 4px solid transparent;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--cedow-charcoal);
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .tab-btn:hover { background: #F4F5F7; }
+
+    .tab-btn.active {
+      background: #FFFFFF;
+      color: var(--cedow-dark-blue);
+      border-top-color: var(--cedow-aqua);
+    }
+
+    .content-section { display: none; padding: 2.5rem; }
+    .content-section.active { display: block; }
+
+    h2 {
+      color: var(--cedow-dark-blue);
+      margin-bottom: 1.2rem;
+      font-size: 1.6rem;
+      border-bottom: 2px solid var(--cedow-silver);
+      padding-bottom: 0.5rem;
+    }
+
+    h3 { color: var(--cedow-aqua); margin: 1.5rem 0 0.8rem 0; font-size: 1.25rem; }
+    h4 { color: var(--cedow-dark-blue); margin: 1rem 0 0.5rem 0; font-size: 1.1rem; }
+
+    p, li {
+      color: var(--cedow-charcoal);
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    ul { margin-left: 1.5rem; margin-bottom: 1.5rem; }
+
+    .two-col { display: flex; gap: 2rem; margin-bottom: 2rem; }
+    .two-col > div { flex: 1; }
+
+    /* Accordion */
+    .accordion-item {
+      border: 1px solid var(--cedow-silver);
+      border-radius: 6px;
+      margin-bottom: 0.8rem;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      width: 100%;
+      background: #F8FAFC;
+      border: none;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      color: var(--cedow-dark-blue);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.05rem;
+      text-align: left;
+    }
+
+    .accordion-header:hover { background: #EDF2F7; }
+    .accordion-header .chev { transition: transform 0.2s; flex-shrink: 0; }
+    .accordion-header[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+    .accordion-content {
+      display: none;
+      padding: 1.5rem;
+      background: #FFFFFF;
+      border-top: 1px solid var(--cedow-silver);
+    }
+    .accordion-content.open { display: block; }
+
+    /* Reading Rope image */
+    .rope-image-wrapper {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #F8FAFC;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--cedow-silver);
+    }
+    .rope-image-wrapper svg { min-width: 640px; }
+    .rope-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .rope-hint { display: none; font-size: 0.8rem; font-style: italic; margin: 0.4rem 0 0; }
+    @media (max-width: 720px) { .rope-hint { display: block; } }
+
+    /* Rope interactive cards */
+    .rope-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .strand-card { background: #FFF; border: 2px solid; border-radius: 6px; padding: 1.5rem; }
+    .strand-card.upper { border-color: var(--lc); }
+    .strand-card.lower { border-color: var(--wr); }
+
+    .sub-strand {
+      width: 100%;
+      text-align: left;
+      background: #EAECEF;
+      border: 2px solid transparent;
+      color: var(--cedow-black);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0.3rem 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: block;
+    }
+
+    .strand-card.upper .sub-strand:hover,
+    .strand-card.upper .sub-strand.active { background: #E0F2F1; color: var(--cedow-aqua); }
+    .strand-card.upper .sub-strand.active { border-color: var(--cedow-aqua); }
+    .strand-card.lower .sub-strand:hover,
+    .strand-card.lower .sub-strand.active { background: #E8EAF6; color: var(--cedow-dark-blue); }
+    .strand-card.lower .sub-strand.active { border-color: var(--cedow-dark-blue); }
+
+    #strandDetailCard {
+      background: #FFF;
+      border-left: 5px solid var(--cedow-gold);
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-top: 1.5rem;
+      border-radius: 4px;
+    }
+    #strandDetailCard p { margin-bottom: 0; }
+
+    /* Sorting activity */
+    .sort-bank {
+      background: #FFFBF2;
+      border: 2px solid var(--cedow-gold);
+      border-radius: var(--border-radius);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .sort-bank h4 { margin-top: 0; }
+    .sort-bank .empty-msg { margin: 0.5rem 0 0; font-style: italic; }
+
+    .sort-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      background: #FFFFFF;
+      border: 1px solid var(--cedow-silver);
+      border-radius: 4px;
+      padding: 0.6rem 0.8rem;
+      margin: 0.5rem 0;
+      font-weight: 600;
+    }
+    .sort-item.shake { animation: shake 0.35s; border-color: var(--error); }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .sort-choices { display: flex; gap: 0.4rem; }
+    .sort-choices button {
+      border: none;
+      border-radius: 4px;
+      padding: 0.45rem 0.8rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #FFFFFF;
+      cursor: pointer;
+    }
+    .sort-choices .to-lit { background: var(--wr); }
+    .sort-choices .to-eng { background: var(--lc); }
+    .sort-choices button:hover { filter: brightness(1.15); }
+
+    .classifier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .bank-box {
+      background: #F8FAFC;
+      border: 2px dashed var(--cedow-silver);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      min-height: 200px;
+    }
+    .bank-box h4 { text-align: center; margin-top: 0; }
+    .bank-box.lit { border-color: var(--wr); background: #F6F7FC; }
+    .bank-box.eng { border-color: var(--lc); background: #F3FAFA; }
+    .bank-box.lit h4 { color: var(--wr); }
+    .bank-box.eng h4 { color: var(--lc); }
+    .bank-box.lit .item-chip { background: var(--wr); }
+    .bank-box.eng .item-chip { background: var(--lc); }
+
+    .item-chip {
+      background: var(--success);
+      color: #FFFFFF;
+      padding: 0.7rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      animation: pop 0.25s ease;
+    }
+    @keyframes pop { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+    #sorterFeedback {
+      margin-top: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      font-size: 1.05rem;
+      min-height: 1.6em;
+    }
+    #sorterFeedback.ok { color: var(--success); }
+    #sorterFeedback.bad { color: var(--error); }
+
+    .sort-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .sort-score { font-weight: 700; color: var(--cedow-dark-blue); }
+
+    /* 90-min visualiser */
+    .time-bar-wrapper {
+      display: flex;
+      height: 50px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .time-literacy, .time-english {
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: width 0.4s ease;
+    }
+    .time-literacy { background: var(--wr); }
+    .time-english { background: var(--lc); }
+
+    .stage-btn-group { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+    .stage-btn {
+      padding: 0.8rem 1.2rem;
+      background: var(--cedow-silver);
+      color: var(--cedow-black);
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .stage-btn:hover { background: #C2C3C6; }
+    .stage-btn.active { background: var(--cedow-dark-blue); color: #FFFFFF; }
+
+    #stageDetailsBox {
+      background: #F8FAFC;
+      padding: 1.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--cedow-silver);
+      margin-top: 1.5rem;
+    }
+    #stageDetailsBox .two-col { margin-bottom: 0; }
+    #stageDetailsBox ul { margin-bottom: 0; }
+
+    /* Diagnostics */
+    .scenario-card {
+      background: #FFFFFF;
+      border-left: 4px solid var(--cedow-gold);
+      margin-bottom: 1.2rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .scenario-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 1.5rem;
+      cursor: pointer;
+      color: var(--cedow-black);
+      font-size: 1rem;
+    }
+    .scenario-toggle:hover { background: #FAFAFA; }
+    .scenario-toggle strong { display: flex; justify-content: space-between; gap: 1rem; }
+    .scenario-toggle .chev { transition: transform 0.2s; flex-shrink: 0; }
+    .scenario-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    .scenario-toggle p { margin: 0.5rem 0 0; font-size: 0.95rem; }
+
+    .scenario-answer {
+      display: none;
+      margin: 0 1.5rem;
+      padding: 1rem 0 0.5rem;
+      border-top: 1px solid var(--cedow-silver);
+    }
+    .scenario-answer.open { display: block; }
+
+    /* Reflection */
+    label { display: block; }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 1rem;
+      border: 1px solid var(--cedow-silver);
+      border-radius: 4px;
+      margin: 0.5rem 0 1.5rem 0;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    .btn-action {
+      background: var(--cedow-aqua);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0 0.8rem 0.8rem 0;
+    }
+    .btn-action:hover { background: var(--cedow-dark-blue); }
+    .btn-action.secondary { background: var(--cedow-silver); color: var(--cedow-black); }
+    .btn-action.secondary:hover { background: #C2C3C6; }
+
+    #copyStatus { font-weight: 600; color: var(--success); min-height: 1.5em; }
+
+    /* Prev / next */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem 2rem;
+      gap: 1rem;
+    }
+    .step-nav .btn-action { margin: 0; }
+    .step-nav .btn-action:disabled { opacity: 0.4; cursor: default; background: var(--cedow-silver); color: var(--cedow-black); }
+    #stepCounter { font-weight: 600; color: var(--cedow-charcoal); font-size: 0.9rem; }
+
+    /* Key terms */
+    .terms-note {
+      background: #F0F7F8;
+      border-left: 4px solid var(--cedow-aqua);
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      margin: 1.5rem 0 0.5rem;
+      font-size: 0.95rem;
+      color: var(--cedow-charcoal);
+    }
+    .term-sample, .term {
+      text-decoration: underline dotted var(--cedow-aqua);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+    .term {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      cursor: help;
+    }
+    .term:hover, .term[aria-expanded="true"] { color: var(--cedow-aqua); }
+    .term .dagger { font-size: 0.75em; vertical-align: super; margin-left: 1px; }
+
+    #termPopover {
+      position: absolute;
+      z-index: 50;
+      max-width: 340px;
+      background: #FFFFFF;
+      border: 1px solid var(--cedow-silver);
+      border-top: 4px solid var(--cedow-aqua);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      padding: 0.9rem 1rem;
+      display: none;
+    }
+    #termPopover.other { border-top-color: var(--cedow-gold); }
+    #termPopover h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    #termPopover p { font-size: 0.92rem; margin: 0 0 0.4rem; line-height: 1.55; }
+    #termPopover .src { font-size: 0.78rem; color: #6B6B6E; margin: 0; }
+
+    .def { background: #F8FAFC; border-radius: 4px; padding: 0.7rem 0.9rem; }
+    .def-label {
+      display: inline-block;
+      background: var(--cedow-aqua);
+      color: #FFFFFF;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      margin-right: 0.35rem;
+      vertical-align: 1px;
+    }
+    .def-label.other { background: var(--cedow-gold); color: var(--cedow-black); }
+    .strand-src, .source-note { font-size: 0.82rem; color: #6B6B6E; margin: 0.6rem 0 0; }
+    .source-note { margin: -1rem 0 1rem; }
+    div + .source-note { margin: 0.8rem 0 1rem; }
+
+    .glossary-list { margin: 0 0 2rem; border-top: 1px solid var(--cedow-silver); }
+    .glossary-list dt {
+      font-weight: 700;
+      color: var(--cedow-dark-blue);
+      padding-top: 0.8rem;
+    }
+    .glossary-list dd {
+      color: var(--cedow-charcoal);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid #ECEDEF;
+    }
+    .glossary-list dd .src { display: block; font-size: 0.8rem; color: #6B6B6E; margin-top: 0.2rem; }
+
+    /* Lens colour coding */
+    .lens-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      color: #FFFFFF;
+      vertical-align: 2px;
+      margin-left: 0.3rem;
+    }
+    .phase-box > .lens-tag { margin-left: 0; }
+    #stageDetailsBox h4 .lens-tag { display: table; margin: 0.35rem 0 0; }
+    .lens-tag.wr { background: var(--wr); }
+    .lens-tag.lc { background: var(--lc); }
+    .phase-box { border-top: 4px solid; padding-top: 0.8rem; }
+    .phase-box.wr { border-color: var(--wr); }
+    .phase-box.lc { border-color: var(--lc); }
+
+    .colour-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 1.5rem; margin-top: 0.8rem; font-size: 0.85rem; color: var(--cedow-charcoal); }
+    .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 0.4rem; vertical-align: -2px; }
+    .sw.wr { background: var(--wr); }
+    .sw.lc { background: var(--lc); }
+
+    /* Connecting the Ideas */
+    .parallel-note { background: #F4F6F9; border-left: 5px solid var(--cedow-aqua); border-radius: 6px; padding: 1rem 1.3rem 0.6rem; margin: 0 0 1.4rem; }
+    .parallel-note h3 { margin-top: 0; }
+    .parallel-note ul { margin: 0.4rem 0 0.6rem 1.1rem; }
+    .parallel-note li { margin-bottom: 0.45rem; font-size: 0.95rem; }
+    .parallel-note .source-note { margin: 0.4rem 0 0.4rem; }
+    .connect-panel {
+      border: 2px solid var(--cedow-gold);
+      background: #FFFDF8;
+      border-radius: var(--border-radius);
+      padding: 1.75rem;
+      margin: 1.5rem 0 2rem;
+    }
+    .connect-panel > h3:first-child { margin-top: 0; color: var(--cedow-dark-blue); font-size: 1.4rem; }
+    .connect-panel h4 { margin-top: 1.6rem; }
+
+    .table-scroll { overflow-x: auto; }
+    .lens-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 620px; }
+    .lens-table th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.7rem 0.8rem; font-size: 0.85rem; }
+    .lens-table td { padding: 0.8rem; vertical-align: top; color: var(--cedow-charcoal); border-bottom: 1px solid var(--cedow-silver); }
+    .lens-table tr.wr td { background: var(--wr-tint); }
+    .lens-table tr.lc td { background: var(--lc-tint); }
+    .lens-table tr.wr td:first-child { border-left: 5px solid var(--wr); }
+    .lens-table tr.lc td:first-child { border-left: 5px solid var(--lc); }
+    .muted { font-size: 0.82rem; color: #6B6B6E; }
+
+    .phase-row { display: flex; gap: 1rem; align-items: stretch; margin-top: 1.5rem; }
+    .phase-card { flex: 1; border-radius: 6px; padding: 1.2rem 1.2rem 0.4rem; background: #FFF; border: 2px solid; }
+    .phase-card.wr { border-color: var(--wr); }
+    .phase-card.lc { border-color: var(--lc); }
+    .phase-card ul { margin: 0.6rem 0 0 1.1rem; }
+    .phase-card li { font-size: 0.93rem; margin-bottom: 0.6rem; }
+    .phase-label { display: inline-block; color: #FFF; font-weight: 800; font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 4px; }
+    .phase-card.wr .phase-label { background: var(--wr); }
+    .phase-card.lc .phase-label { background: var(--lc); }
+    .phase-arrow { width: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--cedow-charcoal); }
+    .phase-arrow span { font-size: 2.4rem; color: var(--cedow-gold); line-height: 1; font-weight: 800; }
+    .phase-arrow small { font-size: 0.78rem; line-height: 1.35; }
+
+    .shift-chart { margin-top: 0.5rem; }
+    .shift-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.45rem; }
+    .shift-lbl { width: 100px; font-size: 0.88rem; font-weight: 600; color: var(--cedow-charcoal); flex-shrink: 0; }
+    .shift-bar { flex: 1; display: flex; height: 28px; border-radius: 4px; overflow: hidden; }
+    .shift-bar i { display: flex; align-items: center; justify-content: center; color: #FFF; font-style: normal; font-weight: 700; font-size: 0.82rem; }
+    .shift-bar i.wr { background: var(--wr); }
+    .shift-bar i.lc { background: var(--lc); }
+    .shift-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; font-size: 0.85rem; color: var(--cedow-charcoal); margin-top: 0.6rem; padding-left: calc(100px + 0.8rem); }
+
+    .aims-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 0.8rem; }
+    .aim-card { background: #FFF; border: 1px solid var(--cedow-silver); border-left: 5px solid var(--cedow-gold); border-radius: 6px; padding: 1rem 1.1rem 0.2rem 3.2rem; position: relative; }
+    .aim-num { position: absolute; left: 0.9rem; top: 0.95rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cedow-dark-blue); color: #FFF; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .aim-card h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    .aim-card p { font-size: 0.92rem; margin-bottom: 0.8rem; }
+
+    .nuance { background: #F4F6F9; border-radius: 6px; padding: 1rem 1.2rem; margin-top: 1.5rem; font-size: 0.93rem; color: var(--cedow-charcoal); }
+    .key-message { margin: 1.2rem 0 0; padding: 0.9rem 1.1rem; background: var(--cedow-dark-blue); border-radius: 6px; color: #FFF; }
+    .key-message strong { color: var(--cedow-gold); }
+    .next-hint { margin-top: 1.5rem; padding: 0.8rem 1rem; background: #FFFDF8; border-left: 4px solid var(--cedow-gold); border-radius: 4px; font-size: 0.95rem; }
+
+    /* Science of Reading is / is not */
+    .sor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1rem; }
+    .sor-card { border-radius: 6px; padding: 1.25rem 1.4rem 0.5rem; border: 2px solid; }
+    .sor-card.is { border-color: var(--cedow-aqua); background: #F3FAFA; }
+    .sor-card.isnot { border-color: var(--cedow-gold); background: #FFFBF2; }
+    .sor-card h4 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem; }
+    .sor-card.is h4 { color: var(--cedow-aqua); }
+    .sor-card.isnot h4 { color: #9A5B00; }
+    .sor-icon { width: 1.7rem; height: 1.7rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-size: 0.95rem; font-weight: 800; }
+    .sor-card.is .sor-icon { background: var(--cedow-aqua); }
+    .sor-card.isnot .sor-icon { background: var(--cedow-gold); color: var(--cedow-black); }
+    .sor-card ul { margin: 0.6rem 0 0 1.1rem; }
+    .sor-card li { font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .sor-card li strong { color: var(--cedow-black); }
+    .source-note.sor-src { margin: 0.7rem 0 0; }
+
+    .ref-list { list-style: none; margin-left: 0; }
+    .ref-list li { padding-left: 2rem; text-indent: -2rem; font-size: 0.95rem; margin-bottom: 0.6rem; }
+
+    footer {
+      background: #EAECEF;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--cedow-charcoal);
+      border-top: 1px solid var(--cedow-silver);
+    }
+    footer p { margin: 0; font-size: 0.9rem; }
+
+    /* Mobile */
+    @media (max-width: 720px) {
+      body { padding: 0; }
+      .container { border-radius: 0; }
+      header { padding: 1.5rem; }
+      header h1 { font-size: 1.5rem; }
+      .content-section { padding: 1.5rem; }
+      .step-nav { padding: 1rem 1.5rem 1.5rem; }
+      .tab-btn { min-width: 50%; flex: 1 1 50%; font-size: 0.85rem; }
+      .two-col { flex-direction: column; gap: 0.5rem; }
+      .rope-grid, .classifier-grid { grid-template-columns: 1fr; }
+      .time-literacy, .time-english { font-size: 0.8rem; }
+      .connect-panel { padding: 1.2rem; }
+      .phase-row { flex-direction: column; }
+      .phase-arrow { width: auto; flex-direction: row; gap: 0.6rem; }
+      .phase-arrow span { transform: rotate(90deg); }
+      .aims-grid { grid-template-columns: 1fr; }
+      .svw-grid { grid-template-columns: 1fr 1fr; }
+      .svw-figure { overflow-x: auto; padding: 0.5rem; }
+      .svw-figure svg { min-width: 580px; }
+      .sor-grid { grid-template-columns: 1fr; }
+      .shift-lbl { width: 78px; font-size: 0.8rem; }
+      .shift-legend { padding-left: 0; }
+    }
+
+    /* Print: show the whole module, not just the current tab */
+    @media print {
+      body { background: #FFF; padding: 0; }
+      .container { box-shadow: none; }
+      .nav-tabs, .progress-bar-container, .step-nav, .btn-action, .stage-btn-group,
+      .sort-bank, .sort-footer, #sorterFeedback { display: none !important; }
+      .content-section { display: block !important; padding: 1.5rem 0; page-break-inside: auto; }
+      .content-section + .content-section { page-break-before: always; }
+      .accordion-content, .scenario-answer { display: block !important; }
+      .chev { display: none; }
+      #termPopover { display: none !important; }
+      .term { text-decoration: none; }
+      .connect-panel { page-break-inside: auto; }
+      header, .time-literacy, .time-english, .item-chip, .shift-bar i, .lens-tag, .phase-label, .lens-table th, .lens-table td, .key-message, .aim-num, .sw, .sor-icon, .sor-card, .svw-part, .svw-rope, .process-step span, .cycle-step span, .flw-card h5, .oci-dot {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+    }
+
+    /* Simple View of Writing */
+    .svw-figure { background: #FFFFFF; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1.5rem 0; }
+    .lens-table td { text-align: left; }
+    .mod-note { font-size: 0.85rem; color: #555; border-top: 1px dashed var(--cedow-silver); margin: 0.6rem 0 0; padding-top: 0.5rem; }
+    .build-table td { font-size: 0.86rem; vertical-align: top; min-width: 150px; }
+    .build-table td { vertical-align: top; }
+    .th-pa, .th-cx { padding: 0.4rem 0.5rem; border-radius: 4px; margin-bottom: 0.4rem; font-size: 0.86rem; line-height: 1.4; }
+    .th-pa { background: #E6F4F6; border-left: 4px solid var(--cedow-aqua); }
+    .th-cx { background: #FFF; border: 1px dashed #9AA3AE; border-left: 4px dashed #9AA3AE; color: #444; }
+    .th-pa:last-child, .th-cx:last-child { margin-bottom: 0; }
+    .th-tag { display: block; width: fit-content; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.05rem 0.4rem; border-radius: 3px; margin-bottom: 0.25rem; }
+    .th-tag.pa { background: var(--cedow-aqua); color: #FFF; }
+    .th-tag.cx { background: #EEF0F3; color: #4C4C4E; border: 1px solid #C9CED6; }
+    .th-none { color: #999; text-align: center !important; vertical-align: middle !important; }
+    .th-legend { display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; font-size: 0.85rem; margin: 0 0 0.7rem; }
+    .th-legend > span { display: flex; align-items: center; gap: 0.45rem; }
+    .th-legend .th-tag { display: inline-block; margin: 0; }
+    .flip-hint { font-size: 0.9rem; color: #555; margin-bottom: 0.6rem; }
+    .flip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
+    .flip-card { perspective: 1000px; cursor: pointer; border-radius: 6px; outline: none; }
+    .flip-card:focus-visible { box-shadow: 0 0 0 3px var(--cedow-aqua); }
+    .flip-inner { display: grid; transition: transform 0.55s ease; transform-style: preserve-3d; min-height: 230px; }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--cedow-aqua); border-radius: 6px; padding: 0.9rem 1rem; display: flex; flex-direction: column; }
+    .flip-front { justify-content: center; text-align: center; background: linear-gradient(180deg, #F3FAFB, #FFF); }
+    .flip-front h4 { margin: 0.5rem 0 0; font-size: 1.1rem; color: var(--cedow-dark-blue); }
+    .flip-back { transform: rotateY(180deg); }
+    .flip-back p { font-size: 0.9rem; margin: 0.4rem 0 0.5rem; flex: 1; }
+    .flip-cue { margin-top: auto; padding-top: 0.6rem; font-size: 0.75rem; font-weight: 700; color: var(--cedow-aqua); }
+    @media (max-width: 760px) { .flip-grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .flip-inner { transition: none; } }
+    .svw-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-top: 0.5rem; }
+    .svw-part { border: 2px solid; border-radius: 6px; padding: 0.8rem 0.6rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; background: #FFF; transition: background 0.2s; }
+    .svw-part.tr { border-color: var(--wr); color: var(--wr); }
+    .svw-part.tg { border-color: var(--lc); color: var(--lc); }
+    .svw-part.ef { border-color: var(--cedow-gold); color: #9A5B00; }
+    .svw-part.wm { border-color: var(--cedow-charcoal); color: var(--cedow-charcoal); }
+    .svw-part.tr:hover, .svw-part.tr.active { background: var(--wr); color: #FFF; }
+    .svw-part.tg:hover, .svw-part.tg.active { background: var(--lc); color: #FFF; }
+    .svw-part.ef:hover, .svw-part.ef.active { background: var(--cedow-gold); color: var(--cedow-black); }
+    .svw-part.wm:hover, .svw-part.wm.active { background: var(--cedow-charcoal); color: #FFF; }
+    #svwDetail { background: #FFF; border-left: 5px solid var(--cedow-gold); padding: 1.2rem 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin: 1rem 0; border-radius: 4px; }
+    #svwDetail h4 { margin-top: 0; }
+    #svwDetail p { margin-bottom: 0.5rem; }
+    .svw-rope { background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.5rem 0.8rem; border-radius: 4px; font-size: 0.93rem; }
+    .svw-rope:empty { display: none; }
+    .svw-two { margin-bottom: 1rem; }
+    .band-picker { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: #F4F6F9; border-radius: 8px; padding: 0.8rem 1rem; margin: 0.6rem 0 0.3rem; }
+    .band-lbl { font-weight: 800; color: var(--cedow-dark-blue); margin-right: 0.3rem; }
+    .band-btn { font-family: inherit; font-size: 0.95rem; font-weight: 700; padding: 0.45rem 1.1rem; border-radius: 999px; border: 2px solid var(--cedow-dark-blue); background: #FFF; color: var(--cedow-dark-blue); cursor: pointer; }
+    .band-btn.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .band-status { font-size: 0.85rem; color: var(--cedow-charcoal); margin: 0 0 1.2rem; }
+    .band-block[hidden] { display: none; }
+    @media print { .band-block[hidden] { display: block !important; } .band-picker, .band-status { display: none; } }
+    .oral-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0.8rem 0 1rem; }
+    .oral-card { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--cedow-aqua); border-radius: 6px; padding: 0.8rem 1rem 0.4rem; }
+    .oral-when { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-aqua); }
+    .oral-card h4 { margin: 0.2rem 0 0.4rem; font-size: 1rem; color: var(--cedow-dark-blue); }
+    .oral-card p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .oral-points { margin: 0 0 1.2rem 1.1rem; }
+    .oral-points li { margin-bottom: 0.55rem; font-size: 0.95rem; }
+    .oral-points + .source-note { margin: 0.4rem 0 1.4rem; }
+    @media (max-width: 760px) { .oral-grid { grid-template-columns: 1fr; } }
+    .k2-models { display: grid; gap: 1.2rem; margin: 0.6rem 0 1.4rem; }
+    .k2-model { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 5px solid var(--cedow-dark-blue); border-radius: 8px; padding: 1rem 1.2rem 0.8rem; }
+    .k2-model + .k2-model { border-top-color: var(--cedow-aqua); }
+    .k2-head h4 { margin: 0.35rem 0 0.4rem; font-size: 1.25rem; color: var(--cedow-dark-blue); }
+    .k2-tag { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-charcoal); }
+    .km-flow { display: flex; align-items: stretch; gap: 0.4rem; }
+    .km-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; background: #F4F6F9; border-radius: 8px; padding: 0.9rem 0.8rem 0.6rem; }
+    .km-icon { width: 64px; height: 64px; border-radius: 14px; background: var(--cedow-dark-blue); color: #FFF; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
+    .k2-model + .k2-model .km-icon { background: #1E5B8F; }
+    .km-icon svg { width: 40px; height: 40px; }
+    .km-body h5 { margin: 0 0 0.35rem; font-size: 1.05rem; font-weight: 800; color: var(--cedow-dark-blue); text-transform: uppercase; letter-spacing: 0.5px; }
+    .km-body h5 span { display: block; font-size: 0.8rem; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--cedow-aqua); }
+    .km-body p { font-size: 0.88rem; line-height: 1.5; margin: 0 0 0.45rem; }
+    .km-body .km-nesa { font-size: 0.8rem; color: var(--cedow-charcoal); }
+    .km-body .km-svw { font-size: 0.78rem; color: #6B6B6E; font-style: italic; }
+    .km-arrow { align-self: center; font-size: 1.4rem; font-weight: 800; color: var(--cedow-gold); }
+    .km-read { display: flex; justify-content: center; }
+    .km-read .km-step { flex: 0 1 46%; }
+    .km-bracket { height: 22px; margin: 0.3rem 8% 0.5rem; border: 3px solid var(--cedow-gold); border-bottom: none; border-radius: 14px 14px 0 0; position: relative; }
+    .km-bracket::before { content: ''; position: absolute; left: 50%; top: -14px; width: 3px; height: 12px; background: var(--cedow-gold); }
+    @media (max-width: 760px) { .km-flow { flex-direction: column; } .km-arrow { transform: rotate(90deg); } .km-read .km-step { flex-basis: 100%; } .km-bracket { display: none; } .km-read { margin-bottom: 0.6rem; } }
+    .process-row, .cycle-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0 1.5rem; counter-reset: none; }
+    .process-step, .cycle-step { flex: 1 1 150px; position: relative; background: #FFF; border: 2px solid var(--cedow-silver); border-radius: 6px; padding: 0.8rem 0.8rem 0.8rem 2.9rem; font-weight: 700; font-size: 0.93rem; color: var(--cedow-dark-blue); display: flex; align-items: center; min-height: 64px; }
+    .process-step span, .cycle-step span { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cedow-gold); color: var(--cedow-black); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .cycle-step { border-color: var(--lc); }
+    .cycle-step span { background: var(--lc); color: #FFF; }
+    .flw-figure img { width: 100%; max-width: 1000px; }
+    .flw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.5rem 0 1.5rem; }
+    .flw-card { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; overflow: hidden; }
+    .flw-card h5 { background: var(--cedow-dark-blue); color: #FFF; font-size: 1rem; padding: 0.55rem 1rem; border-bottom: 4px solid var(--cedow-gold); }
+    .flw-card p { font-size: 0.92rem; margin: 0.7rem 1rem; }
+    .flw-def { font-style: italic; color: var(--cedow-dark-blue) !important; }
+    .oci-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 0.45rem; vertical-align: 0; }
+    .oci-table td:first-child { width: 30%; }
+    .practice-list li { margin-bottom: 0.5rem; }
+    .consider-grid + .source-note, .table-scroll + .source-note, .nesa-figure + .source-note, .practice-list + .source-note { margin: 0.8rem 0 1rem; }
+    .factor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.5rem 0 1rem; }
+    .phase-box.ef { border-color: var(--cedow-gold); }
+    .pw-list li { margin-bottom: 0.35rem; }
+    .consider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+    .consider-card { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--lc); border-radius: 6px; padding: 1rem 1.2rem 0.3rem; }
+    .consider-card h4 { margin-top: 0; }
+    .consider-card ul { margin: 0.4rem 0 0 1.1rem; }
+    .consider-card li { font-size: 0.93rem; margin-bottom: 0.5rem; }
+    .nesa-figure { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1.5rem 0; text-align: center; }
+    .nesa-figure img { max-width: 100%; width: 760px; height: auto; }
+    .nesa-figure figcaption { font-size: 0.82rem; color: var(--cedow-charcoal); margin-top: 0.6rem; text-align: left; }
+    .bda-table td:first-child { width: 22%; white-space: nowrap; }
+    .bda-table { margin-bottom: 0.5rem; }
+    .svw-map-h { margin-top: 2rem; }
+    @media (max-width: 720px) { .factor-grid, .consider-grid, .flw-grid { grid-template-columns: 1fr; } .oci-table td:first-child { width: auto; } .svw-grid { grid-template-columns: 1fr 1fr; } .svw-figure { overflow-x: auto; padding: 0.5rem; } .svw-figure svg { min-width: 580px; } }
+    .svw-map td:first-child { width: 22%; }
+
+    /* Stage guide & metalanguage */
+    .sg-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin: 1rem 0 1.5rem; }
+    .sg-stage { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: 8px; padding: 0.8rem 0.5rem; cursor: pointer; color: var(--cedow-dark-blue); display: flex; flex-direction: column; gap: 0.15rem; align-items: center; }
+    .sg-stage strong { font-size: 1rem; }
+    .sg-stage span { font-size: 0.8rem; color: var(--cedow-charcoal); }
+    .sg-stage:hover { background: #E8EAF6; }
+    .sg-stage.active { background: var(--cedow-dark-blue); color: #FFF; box-shadow: 0 0 0 3px var(--cedow-gold); }
+    .sg-stage.active span { color: #D1D2D4; }
+    .sg-overview { background: var(--cedow-dark-blue); color: #FFF; border-radius: 8px; padding: 1.1rem 1.4rem; }
+    .sg-outs { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    .sg-overview .sg-ohead { font-size: 0.95rem; font-weight: 700; color: #FFF; margin: 0 0 0.35rem; }
+    .sg-overview .sg-ohead::first-line { letter-spacing: 0.2px; }
+    .sg-onote { font-size: 0.88rem; color: var(--cedow-charcoal); margin: 0.55rem 0 0; }
+    .sg-overview h3 span { color: var(--cedow-gold); font-size: 0.95rem; font-weight: 600; margin-left: 0.4rem; }
+    .sg-overview p { color: #E5E7EB; margin: 0; }
+    .sg-h { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; }
+    .sg-num { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--cedow-gold); color: var(--cedow-dark-blue); display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; flex-shrink: 0; }
+    .sg-writes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+    .sg-write { background: #FFF; border: 1px solid var(--cedow-silver); border-top: 5px solid; border-radius: 6px; padding: 0.8rem 1rem 0.2rem; }
+    .sg-write.imaginative { border-top-color: #8E44AD; }
+    .sg-write.informative { border-top-color: var(--lc); }
+    .sg-write.persuasive { border-top-color: #E67E22; }
+    .sg-write.combined { border-top-color: var(--cedow-dark-blue); }
+    .sg-write h5 { font-size: 1rem; color: var(--cedow-dark-blue); margin-bottom: 0.3rem; }
+    .sg-write ul { margin: 0 0 0 1.1rem; }
+    .sg-write li { font-size: 0.92rem; margin-bottom: 0.45rem; }
+    .sg-table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 0.9rem; }
+    .sg-table thead th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.6rem 0.7rem; font-size: 0.85rem; white-space: nowrap; }
+    .sg-table thead th .ks-badge { margin-right: 0.3rem; }
+    .sg-table tbody th { text-align: left; vertical-align: top; width: 15%; background: #F4F6F9; color: var(--cedow-dark-blue); padding: 0.7rem; font-size: 0.88rem; border-bottom: 1px solid var(--cedow-silver); }
+    .sg-table td { vertical-align: top; padding: 0.7rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); line-height: 1.55; width: 28%; }
+    .sg-table td:nth-child(2) { background: #FFFBF2; }
+    .sg-table td:nth-child(4) { background: #F3FAFA; font-style: italic; }
+    .sg-mnote { font-size: 0.88rem; }
+    .sg-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.8rem; }
+    .sg-mcat, .ml-group { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .sg-mcat h5, .ml-group h4 { font-size: 0.92rem; color: var(--cedow-dark-blue); margin: 0 0 0.4rem; }
+    .ml-group h4 span { font-weight: 600; color: #6B6B6E; font-size: 0.82rem; }
+    .ml-chip { display: inline-block; border-radius: 999px; padding: 0.12rem 0.6rem; margin: 0.15rem 0.25rem 0.15rem 0; font-size: 0.82rem; font-weight: 600; border: 1.5px solid; background: #FFF; font-family: inherit; }
+    button.ml-chip.term { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
+    .ml-chip.es1 { border-color: #9A5B00; color: #6B4300; background: #FFF6E5; }
+    .ml-chip.s1 { border-color: var(--lc); color: #0F5E6C; background: #E9F6F7; }
+    .ml-chip.s2 { border-color: #5373B6; color: #2C4F95; background: #EEF2FA; }
+    .ml-chip.s3 { border-color: var(--cedow-dark-blue); color: #FFF; background: var(--cedow-dark-blue); }
+    .ml-chip.is-prior { opacity: 0.55; }
+    .sg-mnote .ml-chip.is-prior { border-color: #999; color: #555; }
+    .sg-ml-link { margin-top: 1rem; }
+    .sg-details { margin-top: 2rem; border: 1px solid var(--cedow-silver); border-radius: 8px; background: #F8FAFC; }
+    .sg-details summary { cursor: pointer; padding: 0.9rem 1.2rem; font-weight: 700; color: var(--cedow-dark-blue); }
+    .sg-details-body { padding: 0 1.2rem 1.2rem; }
+    .ml-controls { display: grid; gap: 0.7rem; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; margin: 1rem 0 0.6rem; }
+    .ml-legend { font-size: 0.85rem; color: var(--cedow-charcoal); margin-bottom: 0.8rem; }
+    .ml-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.8rem; }
+    @media (max-width: 720px) {
+      .sg-stages { grid-template-columns: 1fr 1fr; }
+      .sg-table { min-width: 0; }
+      .sg-table thead { display: none; }
+      .sg-table, .sg-table tbody, .sg-table tr, .sg-table th, .sg-table td { display: block; width: 100% !important; }
+      .sg-table tr { border: 1px solid var(--cedow-silver); border-radius: 6px; margin-bottom: 0.8rem; overflow: hidden; }
+      .sg-table tbody th { background: var(--cedow-dark-blue); color: #FFF; }
+      .sg-table td::before { content: attr(data-label); display: block; font-style: normal; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    }
+    @media print { .sg-stages, .ml-controls, .sg-ml-link { display: none !important; } .sg-details { display: none; } }
+
+    .sg-writelist { columns: 2; column-gap: 2rem; background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 1rem 1.2rem 0.6rem 2.2rem; margin: 0; }
+    .sg-writelist li { break-inside: avoid; margin-bottom: 0.5rem; font-size: 0.94rem; }
+    .sg-writes { display: block !important; }
+    .sg-code { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.15); color: var(--cedow-gold); padding: 0.05rem 0.4rem; border-radius: 3px; margin: 0 0.1rem; }
+    .sg-codes { margin-top: 0.7rem; font-size: 0.82rem; color: #D1D2D4; }
+    .sg-codes .oc-code { margin: 0.15rem 0.15rem 0 0; }
+    .sg-table thead .ks-badge.ks { background: #FFF; color: var(--cedow-dark-blue); }
+    @media (max-width: 720px) { .sg-writelist { columns: 1; } }
+    .cg-list { display: grid; gap: 0.7rem; }
+    .cg { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 8px; overflow: hidden; }
+    .cg-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; background: #F4F6F9; padding: 0.65rem 1rem; border-bottom: 1px solid var(--cedow-silver); }
+    .cg-title { font-weight: 800; color: var(--cedow-dark-blue); font-size: 1rem; }
+    .cg-count { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: var(--cedow-charcoal); }
+    .cg-pts { list-style: disc; margin: 0; padding: 0.75rem 1rem 0.2rem 2.1rem; }
+    .cg-pts li { margin: 0 0 0.6rem; padding-left: 0.2rem; font-size: 0.93rem; line-height: 1.6; transition: opacity 0.2s; }
+    .cg-pts li::marker { color: var(--cedow-dark-blue); }
+    .hl-s { text-decoration: underline; text-decoration-color: var(--lc); text-decoration-thickness: 2.5px; text-underline-offset: 3px; font-weight: 700; color: #0F5E6C; }
+    .hl-k { background: #FFEFC9; color: #5A3800; border-radius: 3px; padding: 0 0.15rem; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .cg-list[data-hl="k"] .hl-s { text-decoration: none; font-weight: inherit; color: inherit; }
+    .cg-list[data-hl="s"] .hl-k { background: none; color: inherit; padding: 0; }
+    .cg-list[data-hl="k"] li:not(.has-k), .cg-list[data-hl="s"] li:not(.has-s) { opacity: 0.4; }
+    .rd-guide { background: #F4F6F9; border-left: 4px solid var(--cedow-dark-blue); border-radius: 6px; padding: 0.8rem 1rem; margin-bottom: 0.9rem; }
+    .rd-guide p { margin: 0 0 0.6rem; font-size: 0.93rem; line-height: 1.6; }
+    .rd-toggle { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .rd-toggle span { font-size: 0.82rem; font-weight: 800; color: var(--cedow-dark-blue); margin-right: 0.2rem; }
+    .rd-toggle button { font-family: inherit; font-size: 0.85rem; font-weight: 700; padding: 0.3rem 0.85rem; border-radius: 999px; border: 1.5px solid var(--cedow-dark-blue); background: #FFF; color: var(--cedow-dark-blue); cursor: pointer; }
+    .rd-toggle button.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .cg-key { margin-top: 0.7rem; }
+    @media (max-width: 720px) { .cg-count { margin-left: 0; } .cg-pts li { font-size: 0.9rem; } }
+    .fp-key { font-size: 0.85rem; color: var(--cedow-charcoal); margin-bottom: 0.6rem; }
+    .fp-table td { width: 42.5% !important; font-style: normal !important; }
+    .fp-table td:nth-child(2) { background: #FFFBF2; }
+    .fp-table td:nth-child(3) { background: #FFF; }
+    .fp-table ul { list-style: none; margin: 0; padding: 0; }
+    .fp-table li { display: flex; gap: 0.5rem; align-items: flex-start; margin: 0 0 0.55rem; font-size: 0.88rem; line-height: 1.5; }
+    .fp-terms { font-size: 0.8rem; color: #6B6B6E; margin-top: 0.3rem; }
+    .fp-terms b { color: #9A5B00; display: block; margin-bottom: 0.15rem; }
+    .fp-terms em { font-style: normal; display: inline-block; background: #FFF6E5; border: 1px solid #F3D59B; color: #6B4300; border-radius: 999px; padding: 0.05rem 0.5rem; margin: 0.15rem 0.25rem 0 0; font-size: 0.76rem; font-weight: 600; }
+    .fp-none { color: #999; margin: 0; }
+    .sg-writelist.one { columns: 1; }
+    /* Knowledge & skills */
+    .ks-key { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0 0.5rem; }
+    .ks-key-item { display: flex; gap: 0.7rem; align-items: flex-start; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.8rem; font-size: 0.9rem; color: var(--cedow-charcoal); line-height: 1.5; }
+    .ks-badge { flex-shrink: 0; display: inline-block; min-width: 3.4rem; text-align: center; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.3px; padding: 0.2rem 0.45rem; border-radius: 4px; color: #FFF; white-space: nowrap; }
+    .ks-badge.k { background: #9A5B00; }
+    .ks-badge.s { background: var(--lc); }
+    .ks-badge.ks { background: var(--cedow-dark-blue); }
+    .ks-badge.ap { background: var(--cedow-gold); color: var(--cedow-dark-blue); }
+    .ks-controls { display: grid; gap: 0.7rem; background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: var(--border-radius); padding: 1rem; }
+    .ks-ctrl { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+    .ks-ctrl-lbl { width: 90px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--cedow-charcoal); }
+    .ks-btns { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .ks-btn { background: #FFF; border: 2px solid var(--cedow-dark-blue); color: var(--cedow-dark-blue); border-radius: 999px; padding: 0.4rem 0.9rem; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
+    .ks-btn:hover { background: #E8EAF6; }
+    .ks-btn.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .ks-summary { margin: 1.2rem 0 0.8rem; }
+    .ks-sum-text { margin-bottom: 0.4rem; color: var(--cedow-dark-blue); }
+    .ks-bar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; background: #EEE; }
+    .ks-bar i { display: flex; align-items: center; justify-content: center; color: #FFF; font-style: normal; font-weight: 700; font-size: 0.8rem; }
+    .ks-bar i.k, .ks-legend i.k { background: #9A5B00; }
+    .ks-bar i.ks, .ks-legend i.ks { background: var(--cedow-dark-blue); }
+    .ks-bar i.s, .ks-legend i.s { background: var(--lc); }
+    .ks-legend { display: flex; gap: 1.2rem; font-size: 0.82rem; color: var(--cedow-charcoal); margin-top: 0.35rem; }
+    .ks-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 0.35rem; vertical-align: -1px; }
+    .ks-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .ks-group { background: #FFF; border: 1px solid var(--cedow-silver); border-radius: 6px; overflow: hidden; }
+    .ks-group-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; background: #F4F6F9; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--cedow-silver); }
+    .ks-group-head h4 { margin: 0; font-size: 1rem; }
+    .ks-rope { font-size: 0.72rem; font-weight: 700; color: var(--lc); background: #E0F2F1; padding: 0.15rem 0.5rem; border-radius: 999px; }
+    .ks-group ul { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0.6rem; }
+    .ks-group li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.9rem; padding: 0.4rem 0; margin: 0; border-bottom: 1px dashed #E5E7EB; line-height: 1.5; }
+    .ks-group li:last-child { border-bottom: none; }
+    .ks-meta { display: block; margin-top: 0.3rem; font-size: 0.8rem; color: #6B6B6E; }
+    .ks-meta b { color: #9A5B00; font-weight: 700; margin-right: 0.25rem; }
+    .ks-meta em, .ks-metalist em { font-style: normal; display: inline-block; background: #FFF6E5; border: 1px solid #F3D59B; color: #6B4300; border-radius: 999px; padding: 0.05rem 0.5rem; margin: 0.15rem 0.25rem 0 0; font-size: 0.78rem; font-weight: 600; }
+    .ks-metalist { margin-top: 0.9rem; background: #FFFBF2; border: 1px solid #F3D59B; border-left: 5px solid var(--cedow-gold); border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .ks-metalist h4 { margin: 0 0 0.3rem; font-size: 0.95rem; color: #6B4300; }
+    .ks-metalist h4 span { font-weight: 600; font-size: 0.82rem; }
+    .ks-empty { font-style: italic; }
+    @media (max-width: 720px) { .ks-key, .ks-groups { grid-template-columns: 1fr; } .ks-ctrl-lbl { width: 100%; } }
+    @media print { .ks-controls { display: none !important; } }
+
+    /* Syllabus progression */
+    .prog-areas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .prog-area { background: #FFF; border: 2px solid var(--cedow-dark-blue); color: var(--cedow-dark-blue); border-radius: 999px; padding: 0.55rem 1rem; font-weight: 700; font-size: 0.92rem; cursor: pointer; }
+    .prog-area:hover { background: #E8EAF6; }
+    .prog-area.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .prog-intro { background: #F8FAFC; border: 1px solid var(--cedow-silver); border-radius: 6px; padding: 0.9rem 1.1rem; margin-top: 1rem; }
+    .prog-intro p { margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .prog-intro .def { padding: 0; background: none; }
+    .prog-rope { background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.5rem 0.8rem; border-radius: 4px; margin-bottom: 0 !important; }
+    .prog-track { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; margin: 1.2rem 0 0.8rem; }
+    .prog-track::before { content: ''; position: absolute; top: 17px; left: 12.5%; right: 12.5%; height: 4px; background: var(--cedow-silver); border-radius: 2px; }
+    .prog-stage { position: relative; background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0 0.3rem; color: var(--cedow-charcoal); }
+    .prog-stage .dot { width: 30px; height: 30px; border-radius: 50%; background: #FFF; border: 4px solid var(--cedow-silver); z-index: 1; transition: all 0.2s; }
+    .prog-stage .lbl { font-weight: 700; font-size: 0.95rem; }
+    .prog-stage .yrs { font-size: 0.8rem; color: #6B6B6E; }
+    .prog-stage.done .dot { border-color: var(--lc); background: var(--lc); }
+    .prog-stage.active .dot { border-color: var(--cedow-gold); background: var(--cedow-dark-blue); transform: scale(1.15); }
+    .prog-stage.active .lbl { color: var(--cedow-dark-blue); }
+    .prog-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; }
+    .prog-controls .btn-action { margin: 0; padding: 0.6rem 1rem; font-size: 0.9rem; }
+    .prog-controls .btn-action:disabled { opacity: 0.4; cursor: default; }
+    .prog-detail { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: var(--border-radius); padding: 1.2rem 1.4rem; }
+    .prog-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .prog-head h4 { margin: 0 0 0.6rem; }
+    .prog-count { font-size: 0.82rem; font-weight: 700; color: #6B6B6E; }
+    .prog-outcomes { display: grid; gap: 0.6rem; }
+    .prog-outcome { display: flex; gap: 0.8rem; align-items: flex-start; background: #F8FAFC; border-radius: 6px; padding: 0.7rem 0.9rem; }
+    .prog-outcome p { margin: 0; font-size: 0.95rem; }
+    .prog-new { margin-top: 1rem; background: #FFFBF2; border-left: 5px solid var(--cedow-gold); border-radius: 4px; padding: 0.7rem 0.9rem; font-size: 0.95rem; color: var(--cedow-charcoal); }
+    .prog-compare { margin-top: 1.2rem; }
+    .prog-cols { display: flex; align-items: stretch; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.4rem; }
+    .prog-col { flex: 1 1 0; min-width: 200px; background: #FFF; border: 1px solid var(--cedow-silver); border-top: 4px solid var(--lc); border-radius: 6px; padding: 0.8rem; }
+    .prog-col.current { border-top-color: var(--cedow-gold); box-shadow: 0 0 0 2px var(--cedow-gold) inset; }
+    .prog-col h5 { color: var(--cedow-dark-blue); font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .prog-col .prog-outcome { flex-direction: column; gap: 0.35rem; padding: 0.6rem; margin-bottom: 0.5rem; }
+    .prog-col .prog-outcome p { font-size: 0.86rem; }
+    .prog-arrow { align-self: center; color: var(--cedow-gold); font-weight: 800; font-size: 1.3rem; }
+    @media (max-width: 720px) { .prog-stage .lbl { font-size: 0.8rem; } .prog-stage .yrs { font-size: 0.7rem; } .prog-outcome { flex-direction: column; gap: 0.35rem; } }
+    @media print { .prog-controls, .prog-track, .prog-areas { display: none !important; } .prog-compare { display: block !important; } }
+
+    /* Outcome tables */
+    .oc-note { margin: -0.4rem 0 1rem; }
+    .oc-note a { color: var(--cedow-aqua); }
+    .outcome-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.5rem 0 1rem; min-width: 560px; }
+    .outcome-table th { background: var(--cedow-dark-blue); color: #FFF; text-align: left; padding: 0.55rem 0.7rem; font-size: 0.82rem; }
+    .outcome-table td { padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); vertical-align: top; }
+    .outcome-table tr:nth-child(even) td { background: #F8FAFC; }
+    .oc-stage { white-space: nowrap; font-weight: 600; color: var(--cedow-black) !important; }
+    .oc-code { display: inline-block; white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; font-weight: 700; background: #E8EAF6; color: var(--cedow-dark-blue); padding: 0.15rem 0.45rem; border-radius: 3px; }
+    .rope-tie { font-size: 0.92rem; background: #F3FAFA; border-left: 4px solid var(--lc); padding: 0.6rem 0.8rem; border-radius: 4px; margin-bottom: 0; }
+
+    /* Writing module additions */
+    .strand-group { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: var(--lc); margin: 1rem 0 0.2rem; }
+    .strand-card .strand-group:first-of-type { margin-top: 0.5rem; }
+    .rope-link { margin-top: 1.5rem; background: #F4F6F9; border-radius: 6px; padding: 1rem; }
+    .rope-link h5 { font-size: 0.95rem; color: var(--cedow-dark-blue); margin-bottom: 0.5rem; }
+    .rope-link table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .rope-link th { text-align: left; background: var(--cedow-dark-blue); color: #FFF; padding: 0.4rem 0.5rem; }
+    .rope-link td { padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--cedow-silver); color: var(--cedow-charcoal); vertical-align: top; }
+    .rope-link td:first-child { font-weight: 700; color: var(--cedow-black); }
+    .rope-link p { font-size: 0.85rem; margin: 0.6rem 0 0; }
+    #step3 .nuance { margin-top: 2rem; }
+  
+    .stage-hint, .sw-hint { font-size: 0.95rem; font-weight: 700; color: var(--cedow-dark-blue); background: #EEF2F8; border: 1px dashed var(--cedow-dark-blue); border-radius: 6px; padding: 0.45rem 0.8rem; margin: 0.8rem 0 0.4rem; }
+    .sw-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0; }
+    .sw-tab { font: inherit; font-weight: 700; font-size: 0.92rem; padding: 0.55rem 1rem; border: 2px solid var(--cedow-dark-blue); border-bottom: none; border-radius: 8px 8px 0 0; background: #F4F5F7; color: var(--cedow-dark-blue); cursor: pointer; }
+    .sw-tab.active { background: var(--cedow-dark-blue); color: #FFF; }
+    .sw-tab.act.active { background: #3F8F9E; border-color: #3F8F9E; } .sw-tab.act { border-color: #3F8F9E; color: #2C6B76; }
+    .sw-tab.bld.active { background: #E8902E; border-color: #E8902E; } .sw-tab.bld { border-color: #E8902E; color: #8A4B08; }
+    .sw-tab.act.active, .sw-tab.bld.active { color: #FFF; }
+    .sw-panel { border: 2px solid var(--cedow-dark-blue); border-radius: 0 8px 8px 8px; padding: 0.6rem 1.1rem 1rem; margin-bottom: 1.4rem; }
+    .sw-panel.act { border-color: #3F8F9E; } .sw-panel.bld { border-color: #E8902E; }
+    .nesa-q { margin: 0.6rem 0 1rem; padding: 0.6rem 0.9rem; background: #EEF2F8; border-left: 4px solid var(--cedow-dark-blue); border-radius: 4px; font-size: 0.95rem; }
+    .nesa-q .src { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    .code-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; color: #FFF; background: var(--cedow-dark-blue); border-radius: 3px; padding: 0 0.35rem; margin-right: 0.35rem; white-space: nowrap; }
+    .code-tag.w { background: #8A4B08; } .code-tag.o { background: #2C6B76; }
+    .cycle { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0.5rem; margin: 1rem 0 1.4rem; }
+    .cycle .node { background: #FFF; border: 2px solid var(--cedow-dark-blue); border-radius: 10px; padding: 0.7rem; text-align: center; font-weight: 700; color: var(--cedow-dark-blue); }
+    .cycle .node small { display: block; font-weight: 400; color: #444; margin-top: 0.3rem; font-size: 0.82rem; }
+    .cycle .arr { font-size: 1.6rem; color: var(--cedow-aqua); font-weight: 800; }
+    .cycle-note { text-align: center; font-size: 0.88rem; color: #555; margin: -0.8rem 0 1.2rem; }
+    .vs { width: 100%; border-collapse: collapse; margin: 0.6rem 0 1.2rem; font-size: 0.93rem; }
+    .vs th { padding: 0.6rem; color: #FFF; text-align: left; } .vs th.a { background: #3F8F9E; } .vs th.b { background: #E8902E; } .vs th.q { background: var(--cedow-dark-blue); width: 18%; }
+    .vs td { padding: 0.55rem 0.6rem; border-bottom: 1px solid #DDD; vertical-align: top; } .vs td:first-child { font-weight: 700; color: var(--cedow-dark-blue); }
+    .decide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0.6rem 0 1.2rem; }
+    .decide button { font: inherit; text-align: left; cursor: pointer; border: 2px solid var(--cedow-silver); background: #FFF; border-radius: 8px; padding: 0.7rem 0.9rem; }
+    .decide button strong { display: block; color: var(--cedow-dark-blue); margin-bottom: 0.2rem; }
+    .decide button.on { border-color: var(--cedow-dark-blue); background: #EEF2F8; }
+    .decide-out { border-left: 5px solid var(--cedow-aqua); background: #F3FAFB; padding: 0.7rem 1rem; border-radius: 4px; margin-bottom: 1.2rem; min-height: 2.6rem; }
+    .strat-src { font-size: 0.78rem; color: #6B6B6E; margin: 0.4rem 0 0; }
+    @media (max-width: 760px) { .cycle { grid-template-columns: 1fr; } .cycle .arr { transform: rotate(90deg); text-align: center; } .decide { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <p>Catholic Education Diocese of Wollongong — Professional Learning Module</p>
+    <h1>Building Background Knowledge for Reading and Writing</h1>
+  </header>
+  <div class="progress-bar-container" role="progressbar" aria-label="Module progress" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1"><div class="progress-bar" id="progressBar"></div></div>
+  <nav class="nav-tabs" role="tablist" aria-label="Module sections">
+    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="step1" data-step="1">1. What Background Knowledge Is</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step2" data-step="2">2. Why It Matters</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step3" data-step="3">3. What the Syllabus Says</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step4" data-step="4">4. Reading and Writing</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step5" data-step="5">5. Activating vs Building</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step6" data-step="6">6. Strategies</button>
+    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="step7" data-step="7">7. References</button>
+  </nav>
+
+  <section id="step1" class="content-section active" role="tabpanel">
+    <h2>1. What Background Knowledge Is</h2>
+    <p><strong>Background knowledge</strong> is everything a student already knows that they bring to a new text or task: knowledge of the world, of topics and subjects, of words, and of how texts work. It is stored in long-term memory, and it is what readers draw on to make sense of what they read, and what writers draw on to have something to say.</p>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Reading comprehension, Stages 2 and 3</span>To understand texts, proficient readers draw on: background knowledge; vocabulary knowledge; knowledge of text structures. “They make connections to support their understanding by integrating new information with old information while reading.”</blockquote>
+
+    <h3>The Knowledge Students Bring</h3>
+    <p class="flip-hint">Select each card to see what that kind of knowledge looks like.</p>
+    <div class="flip-grid">
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Knowledge of the world. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Knowledge of the world</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Knowledge of the world</h4><p>Everyday experience of people, places and events. NESA's example: a student who has been to a farm “will know that certain animals live on a farm and will bring this knowledge to the text they are reading.”</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Topic and subject knowledge. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Topic and subject knowledge</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Topic and subject knowledge</h4><p>Knowledge of a particular topic or learning area, such as habitats, weather or Australian history. This is the knowledge schools can build most deliberately.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Word knowledge. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Word knowledge</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Word knowledge</h4><p>Vocabulary is knowledge in compact form. NESA lists it alongside background knowledge as something proficient readers draw on, and it is built together with topic knowledge.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Knowledge of texts. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Knowledge of texts</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Knowledge of texts</h4><p>Knowing how texts are structured and what they are for, such as narratives, information reports and arguments. This helps readers predict and writers organise.</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Cultural knowledge. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Cultural knowledge</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Cultural knowledge</h4><p>“Texts require cultural knowledge, and some students for whom English is an additional language or dialect (EAL/D) may not have experience with the cultural context of a text.”</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+<div class="flip-card" role="button" tabindex="0" aria-pressed="false" aria-label="Knowledge that connects. Select to flip."><div class="flip-inner"><div class="flip-face flip-front"><h4>Knowledge that connects</h4><span class="flip-cue">Select to flip ↻</span></div><div class="flip-face flip-back" aria-hidden="true"><h4 style="font-size:0.95rem;margin:0;color:var(--cedow-dark-blue);">Knowledge that connects</h4><p>Knowledge is organised into connected networks, or schemas. The more a student knows about a topic, the easier it is to make sense of, and remember, new information about it (AERO, 2024).</p><span class="flip-cue">Select to flip back ↻</span></div></div></div>
+
+    </div>
+    <h3>Background Knowledge and the Mental Model</h3>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Reading comprehension, Early Stage 1</span>“To gain meaning, a reader needs to construct a representation, or mental model, for the text they’re reading.” “In Early Stage 1, students will most frequently develop their mental models of texts by drawing on their personal experiences, rather than from other influences.” “If they have never been to a farm, they will find it difficult to construct a mental model of a farm to support their comprehension of the text.”</blockquote>
+
+    <div class="nuance"><strong>Prior knowledge or background knowledge?</strong> The two terms are often used interchangeably. In this module, <em>prior knowledge</em> means what a particular student already knows before a lesson, and <em>background knowledge</em> means the broader body of knowledge that teaching sets out to build over time. The syllabus uses <em>background knowledge</em>; NESA's teaching advice uses both.</div>
+    <p class="key-message"><strong>Key message:</strong> background knowledge is what students already know about the world, topics, words and texts. It is the raw material of comprehension and the source of ideas for writing.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 2 explains why knowledge matters for all learning, and what a knowledge-rich approach to curriculum design means.</p>
+  </section>
+
+  <section id="step2" class="content-section" role="tabpanel">
+    <h2>2. Why Background Knowledge Matters</h2>
+    <h3>Knowledge Makes New Learning Easier</h3>
+<div class="consider-grid">
+<div class="consider-card"><h4>Working memory is limited</h4><p>Students can only process a small amount of new information at once. Knowledge held securely in long-term memory can be recalled with little effort, which frees working memory for understanding, reasoning and creating.</p><p class="strat-src">AERO (2024)</p></div>
+<div class="consider-card"><h4>Knowledge sticks to knowledge</h4><p>The more students already know about a topic, the easier it is to take in and remember related new knowledge. AERO likens prior knowledge to Velcro: new knowledge sticks to what is already there.</p><p class="strat-src">AERO (2024)</p></div>
+<div class="consider-card"><h4>Skills depend on knowledge</h4><p>Thinking skills such as inferring, comparing and evaluating cannot be applied in a vacuum: students infer, compare and evaluate <em>something</em>. Knowledge helps at every stage of learning, as information is taken in, thought about and stored (Willingham, 2006).</p><p class="strat-src">AERO (2024); Willingham (2006)</p></div>
+</div>
+
+    <div class="cycle" aria-label="Knowledge builds comprehension, which builds learning, which builds more knowledge">
+      <div class="node">Knowledge<small>what students already know</small></div><div class="arr">→</div>
+      <div class="node">Comprehension<small>reading and listening with understanding</small></div><div class="arr">→</div>
+      <div class="node">New learning<small>which adds to what students know</small></div>
+    </div>
+    <p class="cycle-note">Knowledge begets knowledge: each well-understood text adds to the knowledge students bring to the next.</p>
+
+    <h3>A Knowledge-Rich Approach to Curriculum Design</h3>
+    <p>As part of NSW curriculum reform, NESA commissioned the Australian Education Research Organisation (AERO) to review the evidence for a knowledge-rich curriculum. AERO describes a knowledge-rich curriculum as one that prioritises and explicitly sets out the subject knowledge and related skills students should learn at each stage, and identifies four design features:</p>
+<div class="consider-grid">
+<div class="consider-card"><h4>Selective</h4><p>Content is chosen purposefully for each subject.</p></div>
+<div class="consider-card"><h4>Coherent</h4><p>Content is connected across topics, subjects and stages, so knowledge in one area supports learning in another.</p></div>
+<div class="consider-card"><h4>Carefully sequenced</h4><p>Content builds on prior learning and increases in complexity, so deep and broad knowledge grows over time.</p></div>
+<div class="consider-card"><h4>Clear</h4><p>The curriculum states explicitly what students are expected to know, understand and be able to do.</p></div>
+</div>
+
+    <p class="source-note">Summarised from AERO (2024), <em>A knowledge-rich approach to curriculum design</em>.</p>
+    <h3>Building Knowledge Across the Curriculum</h3>
+    <p>English is where students learn to read and write, but it is also where they read and write <em>about</em> something. When English units are connected to the knowledge students are building in Science and Technology, HSIE and the other learning areas, each strengthens the other.</p>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Stages 1 to 3</span>“Students in Stages 2 and 3 continue to build understanding of increasingly complex texts so that they can enjoy texts and learn across all subjects. For example, in Science, students read to learn facts on natural phenomena.” In Stage 1, through understanding and responding to literature, students can “build disciplinary and world knowledge” and “broaden their vocabulary and grammar.”</blockquote>
+<div class="consider-grid">
+<div class="consider-card"><h4>Integrated literacy and content</h4><p>A meta-analysis of 35 studies (K–5) found that integrating literacy with science and social studies instruction improved vocabulary and comprehension, while also building content knowledge.</p><p class="strat-src">Hwang, Cabell and Joyner (2022)</p></div>
+<div class="consider-card"><h4>Knowledge-building in the early years</h4><p>In a first-grade trial, a 10-day thematic science unit improved science knowledge, vocabulary and reading comprehension, without widening gaps between students.</p><p class="strat-src">Kim et al. (2021)</p></div>
+<div class="consider-card"><h4>An equity issue</h4><p>Students who struggle with reading tend to have gaps in knowledge. A curriculum that deliberately builds shared knowledge gives every student access to it, whatever they bring from home.</p><p class="strat-src">AERO (2024)</p></div>
+</div>
+
+    <div class="connect-panel">
+      <h4 style="margin-top:0;">What it looks like in English, and beyond</h4>
+      <p>This module shows what building background knowledge looks like in English, through reading and writing. But the same strategies apply across the whole curriculum: building the field, teaching topic vocabulary explicitly, reading connected texts, talking and writing about content. They work in Science and Technology, HSIE, PDHPE and Creative Arts in the same way, and every learning area is an opportunity to build the knowledge students bring to their reading and writing.</p>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice (additional): Teaching vocabulary to English language learners K–6</span>“Vocabulary development is essential to support student learning across the primary curriculum.” “It also supports students to build schemas and make connections with their world. Understanding vocabulary is necessary for students to access the curriculum. All students benefit from explicit vocabulary instruction.”</blockquote>
+
+    </div>
+    <p class="key-message"><strong>Key message:</strong> knowledge makes new learning easier, and a knowledge-rich, coherent and well-sequenced curriculum lets knowledge accumulate across subjects and years, for every student.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 3 sets out exactly what the syllabus says about background knowledge.</p>
+  </section>
+
+  <section id="step3" class="content-section" role="tabpanel">
+    <h2>3. What the Syllabus Says</h2>
+    <p>Background knowledge is written into the NSW English K–10 Syllabus (2022). It appears by name in the Early Stage 1 and Stage 1 Reading comprehension outcomes, and in content for Reading comprehension and Understanding and responding to literature at every stage. Building topic knowledge and vocabulary for writing appears in Creating written texts from Stage 2.</p>
+<p class="stage-hint">&#9758; Select a stage to see what the syllabus says.</p><div class="sw-tabs" role="tablist"><button class="sw-tab active" role="tab" aria-selected="true" data-k="es1">Early Stage 1</button><button class="sw-tab" role="tab" aria-selected="false" data-k="s1">Stage 1</button><button class="sw-tab" role="tab" aria-selected="false" data-k="s2">Stage 2</button><button class="sw-tab" role="tab" aria-selected="false" data-k="s3">Stage 3</button></div>
+<div class="sw-panel" data-k="es1" role="tabpanel"><table class="lens-table"><thead><tr><th style="width:20%">Outcome</th><th>Syllabus wording</th></tr></thead><tbody><tr><td><span class="code-tag">ENE-RECOM-01</span></td><td><strong>Outcome:</strong> “comprehends independently read texts using background knowledge, word knowledge and understanding of how sentences connect”</td></tr><tr><td><span class="code-tag">ENE-RECOM-01</span></td><td>“Use background knowledge when identifying connections between a text, own life, other texts and/or the world”</td></tr><tr><td><span class="code-tag">ENE-RECOM-01</span></td><td>“Use known vocabulary to build a mental model of the content of the text”</td></tr><tr><td><span class="code-tag">ENE-UARL-01</span></td><td>“Use background knowledge to support understanding of characters’ actions in a text”</td></tr><tr><td><span class="code-tag">ENE-UARL-01</span></td><td>“Reason using background knowledge as to why a character has acted in a certain way”</td></tr><tr><td><span class="code-tag o">ENE-VOCAB-01</span></td><td>“Use vocabulary that is specific to key learning areas”</td></tr></tbody></table></div>
+<div class="sw-panel" data-k="s1" role="tabpanel" hidden><table class="lens-table"><thead><tr><th style="width:20%">Outcome</th><th>Syllabus wording</th></tr></thead><tbody><tr><td><span class="code-tag">EN1-RECOM-01</span></td><td><strong>Outcome:</strong> “comprehends independently read texts that require sustained reading by activating background and word knowledge, connecting and understanding sentences and whole text, and monitoring for meaning”</td></tr><tr><td><span class="code-tag">EN1-RECOM-01</span></td><td>“Ask a clarifying question when more background knowledge is needed to make an inference”</td></tr><tr><td><span class="code-tag">EN1-RECOM-01</span></td><td>“Use known vocabulary to build a mental model of the content of a text”</td></tr><tr><td><span class="code-tag">EN1-RECOM-01</span></td><td>“Use information read in texts to enhance learning across key learning areas”</td></tr><tr><td><span class="code-tag o">EN1-OLC-01</span></td><td>“Respond to information by asking relevant questions to extend their own and others' knowledge”</td></tr><tr><td><span class="code-tag o">EN1-VOCAB-01</span></td><td>“Understand and intentionally choose subject-specific vocabulary to enhance precision and for effect”</td></tr></tbody></table></div>
+<div class="sw-panel" data-k="s2" role="tabpanel" hidden><table class="lens-table"><thead><tr><th style="width:20%">Outcome</th><th>Syllabus wording</th></tr></thead><tbody><tr><td><span class="code-tag">EN2-RECOM-01</span></td><td>“Build topic knowledge, including key vocabulary, and activate background knowledge prior to and during reading”</td></tr><tr><td><span class="code-tag">EN2-RECOM-01</span></td><td>“Identify how their background knowledge is used to actively build and adjust a mental model prior to and during reading”</td></tr><tr><td><span class="code-tag w">EN2-CWT-01–03</span></td><td>“Research, summarise and list topic-related ideas when planning”</td></tr><tr><td><span class="code-tag w">EN2-CWT-01–03</span></td><td>“Create texts by drawing on personal and others’ experiences, and texts read, viewed and listened to for inspiration and ideas”</td></tr><tr><td><span class="code-tag w">EN2-CWT-01–03</span></td><td>“Use topic-specific Tier 2 and Tier 3 vocabulary to demonstrate authority”</td></tr></tbody></table></div>
+<div class="sw-panel" data-k="s3" role="tabpanel" hidden><table class="lens-table"><thead><tr><th style="width:20%">Outcome</th><th>Syllabus wording</th></tr></thead><tbody><tr><td><span class="code-tag">EN3-RECOM-01</span></td><td>“Bring subject vocabulary, technical vocabulary, background knowledge and conceptual knowledge to new reading tasks”</td></tr><tr><td><span class="code-tag">EN3-RECOM-01</span></td><td>“Analyse how language, background and vocabulary knowledge, and inferencing are used together to effectively build and adjust a mental model prior to and during reading”</td></tr><tr><td><span class="code-tag">EN3-RECOM-01</span></td><td>“Use and compare different texts on similar themes or topics to synthesise ideas or information”</td></tr><tr><td><span class="code-tag w">EN3-CWT-01</span></td><td>“Research and summarise information from several sources to plan for writing”</td></tr><tr><td><span class="code-tag w">EN3-CWT-01</span></td><td>“Use topic-specific Tier 2 and Tier 3 vocabulary intentionally to add credibility and enhance authority”</td></tr><tr><td><span class="code-tag w">EN3-CWT-01</span></td><td>“Create factual and historical accounts that incorporate broader contextual information”</td></tr></tbody></table></div>
+
+    <p class="source-note">NESA (2022), NSW English K–10 Syllabus. Content points are quoted exactly. Stage 2 writing content sits under all three Stage 2 Creating written texts outcomes (EN2-CWT-01, 02 and 03). Colour key: <span class="code-tag">Reading</span> <span class="code-tag w">Writing</span> <span class="code-tag o">Oral language and vocabulary</span></p>
+    <h3>What Changes Across the Stages</h3>
+<div class="consider-grid">
+<div class="consider-card"><h4>Early Stage 1</h4><p>Students <strong>use</strong> background knowledge, mostly from personal experience, to make connections and understand characters.</p></div>
+<div class="consider-card"><h4>Stage 1</h4><p>Students <strong>activate</strong> background knowledge and recognise when they need <strong>more</strong> of it to make an inference.</p></div>
+<div class="consider-card"><h4>Stage 2</h4><p>Students <strong>build</strong> topic knowledge as well as activating it, and notice how it shapes their mental model. Writers research topics.</p></div>
+<div class="consider-card"><h4>Stage 3</h4><p>Students <strong>bring</strong> subject and conceptual knowledge to new tasks, analyse how it works with language and inferencing, and synthesise across texts.</p></div>
+</div>
+
+    <div class="nuance"><strong>Read to every day.</strong> The syllabus text requirements ask teachers to give students daily opportunities to be read to. NESA explains: “By reading aloud and engaging students in discussions, teachers provide students with access to texts beyond their immediate means, introducing them to new ideas and vocabulary and encouraging them to explore different ways of thinking.”</div>
+    <p class="key-message"><strong>Key message:</strong> the syllabus moves students from <em>using</em> what they know, to <em>activating</em> it, to deliberately <em>building</em> and <em>analysing</em> knowledge for reading and writing.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 4 shows how background knowledge supports reading and writing.</p>
+  </section>
+
+  <section id="step4" class="content-section" role="tabpanel">
+    <h2>4. How Background Knowledge Supports Reading and Writing</h2>
+    <h3>Reading</h3>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Reading comprehension and Oral language</span>“Inferences rely on background knowledge and can relate to knowledge of the words encountered in the text or knowledge of the particular type of text and other connections that the reader makes.” (Early Stage 1) “Background knowledge supports reading comprehension.” (Stages 2 and 3)</blockquote>
+<div class="consider-grid">
+<div class="consider-card"><h4>It fills the gaps</h4><p>Writers leave out what they assume readers know. Comprehension depends on filling these gaps with correct inferences, and inferences depend on knowledge (Willingham, 2006).</p><p class="strat-src">Willingham (2006); NESA</p></div>
+<div class="consider-card"><h4>It can outweigh reading skill</h4><p>In a classic study, students who knew a lot about baseball understood and recalled a baseball text better than those who knew little, whatever their reading ability. Weaker readers with high knowledge did as well as stronger readers with high knowledge.</p><p class="strat-src">Recht and Leslie (1988)</p></div>
+<div class="consider-card"><h4>Its effect depends on the text</h4><p>A review of 23 studies found that background knowledge has a range of effects, shaped by the text, the mental model it requires and any misconceptions the reader holds. Readers with less knowledge benefited more from highly cohesive texts.</p><p class="strat-src">Smith et al. (2021)</p></div>
+<div class="consider-card"><h4>It is part of language comprehension</h4><p>In Scarborough's Reading Rope, background knowledge is one of the strands of language comprehension, woven together with word recognition to produce skilled reading.</p><p class="strat-src">Scarborough (2001)</p></div>
+</div>
+
+    <div class="nuance"><strong>Knowledge is necessary, not sufficient.</strong> Knowledge does not replace decoding or language skills. NESA notes that “Although word reading is necessary for reading comprehension, it is not sufficient (Oakhill et al. 2014).” Strong readers need both secure word reading and rich knowledge.</div>
+
+    <h3>Writing</h3>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Creating written texts, Stages 2 and 3</span>Proficient writers “apply knowledge of a topic and its related vocabulary, and combine these with an understanding of genre when developing ideas for writing”. Even at single sentence level, writing requires a student to “generate an idea”, “retrieve the words that represent it” and “arrange and rearrange the words mentally into a sequence that makes sense syntactically and semantically.”</blockquote>
+<div class="consider-grid">
+<div class="consider-card"><h4>Something to say</h4><p>Students cannot write well about what they do not know. Topic knowledge supplies the ideas, details and precise vocabulary that make writing informative and convincing.</p></div>
+<div class="consider-card"><h4>More room to write well</h4><p>Writing places heavy demands on working memory. Writers with extensive topic knowledge can draw on long-term memory, leaving more capacity for planning, sentence construction and revising.</p><p class="strat-src">McCutchen (2011); NESA</p></div>
+<div class="consider-card"><h4>Knowledge of genre</h4><p>Knowing how texts work, gained by reading and analysing mentor texts, helps students structure their own writing for purpose and audience.</p><p class="strat-src">AERO (2024); NESA</p></div>
+</div>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Creating written texts, Stage 1</span>Stage 1: “As students progress into Stage 1, writing contexts should cover both personal experience and content they are learning about in other areas of the curriculum.” Teachers “offer opportunities for students to collaboratively build their background knowledge in preparation for writing for a particular context, purpose and audience”.</blockquote>
+
+    <h3>Reading, Writing and Knowledge Feed Each Other</h3>
+    <div class="cycle" aria-label="Reading builds knowledge, knowledge supports writing, writing deepens knowledge">
+      <div class="node">Reading and listening<small>build knowledge and vocabulary</small></div><div class="arr">⇄</div>
+      <div class="node">Knowledge<small>ideas, words and concepts</small></div><div class="arr">⇄</div>
+      <div class="node">Writing and talking<small>use and consolidate knowledge</small></div>
+    </div>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Stages 2 and 3</span>“Writing can strengthen the process of acquiring new knowledge across different subjects and schooling years (Graham et al. 2020; Huerta and Garza 2019).” “Writing about material that has been read can also improve comprehension of that material (Graham and Hebert 2011).” “Oral language supports vocabulary learning and builds background knowledge.”</blockquote>
+
+    <p class="key-message"><strong>Key message:</strong> knowledge lets readers make the inferences texts demand, and gives writers something to say and the words to say it. Reading, talking and writing about a topic all build knowledge in turn.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 5 distinguishes activating prior knowledge from strategically building knowledge.</p>
+  </section>
+
+  <section id="step5" class="content-section" role="tabpanel">
+    <h2>5. Activating Prior Knowledge vs Building Knowledge</h2>
+    <p>Both matter, but they are not the same. <strong>Activating</strong> brings to mind knowledge students already have. <strong>Building</strong> deliberately teaches knowledge students do not yet have. Activation only works when there is knowledge to activate.</p>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice (additional): Teaching vocabulary to English language learners K–6</span>“Building the field refers to pre-teaching vocabulary and developing background knowledge to enable students to access and participate in learning.” “It is important that building the field activities are interactive so that students can use, observe and experience the language associated with the topic.”</blockquote>
+<blockquote class="nesa-q"><span class="src">NESA, Teaching advice, Reading comprehension, Early Stage 1</span>“Teachers can activate background knowledge that the students already have prior to reading and build background knowledge when students do not have the experiences or vocabulary to relate to the text.”</blockquote>
+<blockquote class="nesa-q"><span class="src">NESA, Syllabus and teaching advice</span>Stage 2 content: “Build topic knowledge, including key vocabulary, and activate background knowledge prior to and during reading”. Stage 1 advice: “Students experiencing difficulties with comprehension may benefit from explicitly building the field of background knowledge before reading a text.”</blockquote>
+
+    <table class="vs">
+      <thead><tr><th class="q"></th><th class="a">Activating prior knowledge</th><th class="b">Building knowledge</th></tr></thead>
+      <tbody>
+        <tr><td>Purpose</td><td>Bring relevant knowledge to mind so students connect it to the new text or task.</td><td>Teach the knowledge and vocabulary students need, so they have something to connect to.</td></tr>
+        <tr><td>Assumes</td><td>Students already know something useful about the topic.</td><td>Students may know little, or hold misconceptions.</td></tr>
+        <tr><td>Timing</td><td>Minutes, at the start of a lesson or before and during reading.</td><td>Over days and weeks, across a unit, and across years as the curriculum accumulates.</td></tr>
+        <tr><td>Planning</td><td>A lesson routine.</td><td>A curriculum decision: which topics, which texts, in what sequence.</td></tr>
+        <tr><td>Risk if used alone</td><td>Students with little knowledge have little to activate, so gaps widen. Misconceptions may be reinforced.</td><td>Without connections to what students know, new knowledge may stay inert. Build and activate together.</td></tr>
+        <tr><td>Example</td><td>“What do you already know about frogs?” before reading a frog life cycle text.</td><td>A two-week unit reading a set of texts on life cycles, with explicit vocabulary, diagrams and writing to explain.</td></tr>
+      </tbody>
+    </table>
+    <h3>Which Do My Students Need?</h3>
+    <p class="sw-hint">&#9758; Select the option that best describes your students' knowledge of the topic.</p>
+    <div class="decide" role="group" aria-label="How much do students know about the topic?">
+      <button data-d="a"><strong>They know a lot</strong>Most students have relevant knowledge and vocabulary.</button>
+      <button data-d="b"><strong>They know some</strong>Knowledge is patchy or varies widely across the class.</button>
+      <button data-d="c"><strong>They know little</strong>The topic, context or vocabulary is new to most students.</button>
+    </div>
+    <div class="decide-out" id="decideOut" aria-live="polite">Select an option above.</div>
+    <div class="nuance"><strong>Why activation is not enough.</strong> Comprehension strategies such as activating prior knowledge are useful, but Willingham argues their benefits come from brief instruction and cannot substitute for knowledge itself (Willingham, 2006/07). Students who start with less knowledge gain least from activation and most from building, which is why knowledge-building is an equity strategy.</div>
+    <p class="key-message"><strong>Key message:</strong> activate when students know something; build when they do not. Most units need both, and building is a planned, cumulative, curriculum-level decision.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 6 gives strategies for activating and for building knowledge.</p>
+  </section>
+
+  <section id="step6" class="content-section" role="tabpanel">
+    <h2>6. Strategies for Activating and Building Knowledge</h2>
+    <p>These strategies are shown in English, but they apply in every learning area. The fourth set shows NESA's examples from Science and Technology, HSIE, PDHPE and Creative Arts.</p>
+    <p class="sw-hint">&#9758; Choose a set of strategies.</p>
+    <div class="sw-tabs" role="tablist">
+      <button class="sw-tab act active" role="tab" aria-selected="true" data-k="act">Activating prior knowledge</button>
+      <button class="sw-tab bld" role="tab" aria-selected="false" data-k="bld">Building knowledge</button>
+      <button class="sw-tab" role="tab" aria-selected="false" data-k="wr">Building knowledge for writing</button>
+      <button class="sw-tab" role="tab" aria-selected="false" data-k="cur">Across the curriculum</button>
+    </div>
+    <div class="sw-panel act" data-k="act" role="tabpanel"><p><strong>Use when students already know something about the topic.</strong> Keep it brief, and listen for gaps and misconceptions.</p><div class="consider-grid">
+<div class="consider-card"><h4>Preview the text</h4><p>Look at the title, images and features together, and ask what students think the text will be about. In Early Stage 1, NESA suggests asking “guiding questions prior to their reading, eg ‘Do you think you know what this story will be about?’” and engaging students “in discussion about their text predictions.”</p><p class="strat-src">NESA, Reading comprehension, Early Stage 1</p></div>
+<div class="consider-card"><h4>Quick retrieval</h4><p>Start with a few low-stakes questions about a previous lesson or unit, so students recall what they know before new learning connects to it.</p><p class="strat-src">HITS: Multiple exposures</p></div>
+<div class="consider-card"><h4>Know, Want to know, Learned</h4><p>A thinking structure for connecting what students know with what they will learn. NESA lists “thinking structures such as Know – Want to know – Learned” among supports for background knowledge. Only use the Know column if students genuinely know something.</p><p class="strat-src">NESA, Reading comprehension, Stages 2 and 3</p></div>
+<div class="consider-card"><h4>Make connections</h4><p>Prompt students to “make text-to-self, text-to-text and text-to-world connections”, and to explain how the connection helps them understand.</p><p class="strat-src">NESA, Reading comprehension, Stage 1</p></div>
+<div class="consider-card"><h4>Think-pair-share</h4><p>Students tell a partner what they know about the topic, then share with the class. Listen for misconceptions to address before reading.</p></div>
+<div class="consider-card"><h4>Support oral language for predicting</h4><p>Predicting “requires the use of conditional language structures”, which can be challenging for EAL/D students. Provide “multiple oral models for a range of sentence and language structures”.</p><p class="strat-src">NESA, Reading comprehension, Early Stage 1</p></div>
+</div>
+</div>
+    <div class="sw-panel bld" data-k="bld" role="tabpanel" hidden><p><strong>Use when students need knowledge they do not yet have.</strong> Plan these across a unit, not just a lesson.</p><div class="consider-grid">
+<div class="consider-card"><h4>Read sets of connected texts</h4><p>Read several texts on the same topic over days or weeks, moving from simpler to more complex. Conceptually connected texts build knowledge and vocabulary more than unrelated texts.</p><p class="strat-src">Cervetti, Wright and Hwang (2016); Wright et al. (2022)</p></div>
+<div class="consider-card"><h4>Read aloud texts beyond students’ reading level</h4><p>“Students benefit from their teacher reading literature to them that is more complex in structure, language and visual elements than the texts they may read independently.” Include informational texts.</p><p class="strat-src">NESA, Understanding and responding to literature, Early Stage 1</p></div>
+<div class="consider-card"><h4>Build the field before reading</h4><p>Explicitly teach the essential concepts, context and vocabulary before students read. NESA: “It is necessary to pre-teach unfamiliar or challenging vocabulary prior to reading.”</p><p class="strat-src">NESA, Reading comprehension, Early Stage 1</p></div>
+<div class="consider-card"><h4>Teach topic vocabulary explicitly</h4><p>Select target words from the texts and learning-area topics students are studying. NESA: target words “can be selected from texts read to the students or concepts from Mathematics and other learning areas.” Plan for repeated encounters across the unit.</p><p class="strat-src">NESA, additional advice, Vocabulary, Early Stage 1</p></div>
+<div class="consider-card"><h4>Connect English to learning-area units</h4><p>Choose texts that teach about the topics students are learning in Science and Technology, HSIE and the Arts. NESA's example: a decodable text about a duck links to a previous unit on animal habitats when students describe “the duck’s habitat”.</p><p class="strat-src">Hwang et al. (2022); NESA, additional advice, Reading comprehension</p></div>
+<div class="consider-card"><h4>Use concrete experiences and visuals</h4><p>Excursions, objects, images and video give students experiences to build on. For EAL/D students, “Providing visuals or real-life objects for key words in a text will help EAL/D students connect meaning.”</p><p class="strat-src">NESA, Reading comprehension, Early Stage 1</p></div>
+<div class="consider-card"><h4>Talk about the topic</h4><p>Structured discussion, rich talk and yarning circles let students use new words and ideas. “Oral language supports vocabulary learning and builds background knowledge.”</p><p class="strat-src">NESA, Oral language, Stages 2 and 3</p></div>
+<div class="consider-card"><h4>Write to learn</h4><p>Have students summarise, explain and record what they have learnt about a topic. Writing about content reliably enhanced learning across subjects.</p><p class="strat-src">Graham, Kiuhara and MacKay (2020)</p></div>
+<div class="consider-card"><h4>Organise and revisit knowledge</h4><p>Use concept maps, text organisers and concept posters to show how ideas connect, and revisit key knowledge regularly so it is retained. NESA lists “concept posters, text organisers” among supports.</p><p class="strat-src">NESA, Reading comprehension, Stages 2 and 3; HITS: Multiple exposures</p></div>
+<div class="consider-card"><h4>Sequence for accumulation</h4><p>Plan units so that knowledge builds over a term and across years: later topics should draw on earlier ones. This is the coherent, carefully sequenced curriculum AERO describes.</p><p class="strat-src">AERO (2024)</p></div>
+</div>
+</div>
+    <div class="sw-panel" data-k="wr" role="tabpanel" hidden><p><strong>Students write best about what they know.</strong></p><div class="consider-grid">
+<div class="consider-card"><h4>Build knowledge before writing</h4><p>Plan a knowledge-building phase before students write: read, view, discuss and take notes on the topic. In Stage 2, students “Research, summarise and list topic-related ideas when planning”.</p></div>
+<div class="consider-card"><h4>Use mentor texts</h4><p>Analyse mentor texts to build knowledge of genre and language features. NESA: mentor texts “provide models for consolidating knowledge about different kinds of texts, sentence types, grammatical usage, vocabulary choice and punctuation.”</p><p class="strat-src">NESA, Creating written texts, Early Stage 1</p></div>
+<div class="consider-card"><h4>Co-construct word banks</h4><p>Build topic word banks with students as knowledge grows. NESA advises “co-constructing and using word banks to support students’ language choices when writing”.</p><p class="strat-src">NESA, Creating written texts, Stages 2 and 3</p></div>
+</div>
+</div>
+    <div class="sw-panel" data-k="cur" role="tabpanel" hidden><p><strong>The same strategies, across the curriculum.</strong> NESA's advice on teaching vocabulary shows these strategies in other K–6 learning areas: “Although the strategies below are demonstrated using content from a particular stage, they can be used across all stages and key learning areas and will benefit all students.”</p><table class="lens-table"><thead><tr><th style="width:22%">Strategy</th><th style="width:22%">Learning area example</th><th>What it looks like</th></tr></thead><tbody><tr><td><span class="code-tag" style="background:#3F8F9E">Activate</span><strong>Accessing prior knowledge</strong></td><td>Creative Arts, Stage 3</td><td>Students describe 2 artworks “using their background knowledge and their known vocabulary”; the teacher “recasts students’ responses using art terminology”.</td></tr><tr><td><span class="code-tag" style="background:#3F8F9E">Activate</span><strong>Mind mapping</strong></td><td>PDHPE, Stage 2</td><td>“When introducing a new concept, the teacher leads the class to brainstorm words they already know about the topic.” Students group words for staying healthy into movement, nutrition, connection and health.</td></tr><tr><td><span class="code-tag" style="background:#3F8F9E">Activate</span><strong>Progressive brainstorm</strong></td><td>HSIE, Early Stage 1</td><td>After a local Aboriginal Dreaming Story, groups add words and images to Who? What? When? Where? Why? posters, which then support an oral recount.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Word, picture and definition match</strong></td><td>Science and Technology, Stage 3</td><td>“The teacher builds the field by pre-teaching the definitions of key vocabulary” before a unit on stars, galaxies, nebulae, exoplanets and black holes.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Word walls with images</strong></td><td>Science and Technology, Stage 2</td><td>Display Tier 3 words with visuals and use them throughout the unit. “The word wall should be used regularly throughout a unit to support vocabulary development”.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Draw, talk, write, share</strong></td><td>Science and Technology, Stage 1</td><td>Students draw the day's weather, share orally with a partner, then write a sentence: ‘Today the weather is [sunny, cloudy, windy …]’.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Dictogloss</strong></td><td>Science and Technology, Stage 2</td><td>Students listen to a short text about measuring temperature, note key words, then reconstruct it in groups, meeting words such as ‘temperature’ and ‘bulb’.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Flow charts and T-charts</strong></td><td>Science and Technology, Stage 1; HSIE, Early Stage 1</td><td>Organise knowledge visually: a life cycle flow chart, or a T-chart sorting natural and human features of places.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Frayer model</strong></td><td>Science and Technology, Stage 2</td><td>Teach a Tier 3 word such as <em>evaporation</em> with a definition, characteristics, examples and non-examples.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Jigsaw reading</strong></td><td>HSIE, Stage 3</td><td>“The teacher pre-teaches key vocabulary relevant for a particular text.” Groups read different parts of a text on migration to Australia, then teach each other the main ideas and key words.</td></tr><tr><td><span class="code-tag" style="background:#E8902E">Build</span><strong>Engaging with artefacts</strong></td><td>HSIE, Early Stage 1</td><td>“In consultation with the local Aboriginal Community”, students interact with cultural objects such as boomerangs and clap sticks, describing them with target words.</td></tr></tbody></table><p class="strat-src">NESA (2024), Teaching advice (additional): Teaching vocabulary to English language learners K–6. Its strategies are designed with EAL/D learners in mind and benefit all students.</p></div>
+    <h3>A Unit at a Glance</h3>
+    <table class="lens-table"><thead><tr><th>When</th><th>Focus</th><th>Example: a Stage 2 unit on natural disasters</th></tr></thead><tbody>
+      <tr><td><strong>Before the unit</strong></td><td>Select and sequence a connected text set; identify key concepts and Tier 2 and 3 words.</td><td>Picture books, information texts and news reports on floods, bushfires and cyclones; words such as <em>evacuate</em>, <em>catastrophe</em>, <em>emergency</em>.</td></tr>
+      <tr><td><strong>Each lesson</strong></td><td>Activate: brief retrieval of yesterday's learning.</td><td>“Name two causes of floods we learnt about.”</td></tr>
+      <tr><td><strong>Weeks 1–2</strong></td><td>Build: read-alouds and shared reading, explicit vocabulary, concept map, discussion.</td><td>Students add to a class concept map after each text.</td></tr>
+      <tr><td><strong>Weeks 2–3</strong></td><td>Build and write: research and note-taking; mentor text analysis.</td><td>Students “Research, summarise and list topic-related ideas when planning”.</td></tr>
+      <tr><td><strong>Weeks 3–4</strong></td><td>Apply: write an information report or persuasive text using topic vocabulary.</td><td>Students use topic-specific Tier 2 and 3 vocabulary to demonstrate authority.</td></tr>
+    </tbody></table>
+    <p class="key-message"><strong>Key message:</strong> activate briefly, build deliberately. Connected texts, explicit vocabulary, talk and writing about a topic, sequenced across units, give every student the knowledge they need to read and write well.</p>
+    <p class="next-hint"><strong>Next:</strong> Step 7 lists the references used in this module.</p>
+  </section>
+
+  <section id="step7" class="content-section" role="tabpanel">
+    <h2>7. References</h2>
+    <ul class="ref-list">
+      <li>Australian Education Research Organisation. (2024). <em>A knowledge-rich approach to curriculum design</em>. AERO. https://www.edresearch.edu.au/research/research-reports/knowledge-rich-approach-curriculum-design</li>
+      <li>Cabell, S. Q., &amp; Hwang, H. (2020). Building content knowledge to boost comprehension in the primary grades. <em>Reading Research Quarterly, 55</em>(S1), S99–S107. https://doi.org/10.1002/rrq.338</li>
+      <li>Cervetti, G. N., Wright, T. S., &amp; Hwang, H. (2016). Conceptual coherence, comprehension, and vocabulary acquisition: A knowledge effect? <em>Reading and Writing, 29</em>, 761–779. https://doi.org/10.1007/s11145-016-9628-x</li>
+      <li>Graham, S., Kiuhara, S. A., &amp; MacKay, M. (2020). The effects of writing on learning in science, social studies, and mathematics: A meta-analysis. <em>Review of Educational Research, 90</em>(2), 179–226. https://doi.org/10.3102/0034654320914744</li>
+      <li>Hwang, H., Cabell, S. Q., &amp; Joyner, R. E. (2022). Effects of integrated literacy and content-area instruction on vocabulary and comprehension in the elementary years: A meta-analysis. <em>Scientific Studies of Reading, 26</em>(3), 223–249.</li>
+      <li>Kim, J. S., Burkhauser, M. A., Mesite, L. M., Asher, C. A., Relyea, J. E., Fitzgerald, J., &amp; Elmore, J. (2021). Improving reading comprehension, science domain knowledge, and reading engagement through a first-grade content literacy intervention. <em>Journal of Educational Psychology, 113</em>(1), 3–26. https://doi.org/10.1037/edu0000465</li>
+      <li>McCutchen, D. (2011). From novice to expert: Implications of language skills and writing-relevant knowledge for memory during the development of writing skill. <em>Journal of Writing Research, 3</em>(1), 51–68.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 (2022): Additional teaching advice</em> (Early Stage 1 and Stage 1: Reading comprehension; Vocabulary). NESA.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 Syllabus</em>. NSW Curriculum website.</li>
+      <li>NSW Education Standards Authority. (2022). <em>English K–10 Syllabus: Teaching advice (Early Stage 1 to Stage 3)</em>. NSW Curriculum website.</li>
+      <li>NSW Education Standards Authority. (2022). <em>Teaching advice: Early Stage 1 – English</em> and <em>Teaching advice: Stage 1 – English</em>. NSW Curriculum website.</li>
+      <li>NSW Education Standards Authority. (2024). <em>Teaching advice (additional): Teaching vocabulary to English language learners K–6</em>. NESA.</li>
+      <li>Recht, D. R., &amp; Leslie, L. (1988). Effect of prior knowledge on good and poor readers’ memory of text. <em>Journal of Educational Psychology, 80</em>(1), 16–20.</li>
+      <li>Scarborough, H. S. (2001). Connecting early language and literacy to later reading (dis)abilities: Evidence, theory, and practice. In S. B. Neuman &amp; D. K. Dickinson (Eds.), <em>Handbook of early literacy research</em> (pp. 97–110). Guilford Press.</li>
+      <li>Smith, R., Snow, P., Serry, T., &amp; Hammond, L. (2021). The role of background knowledge in reading comprehension: A critical review. <em>Reading Psychology, 42</em>(3), 214–240. https://doi.org/10.1080/02702711.2021.1888348</li>
+      <li>State of Victoria (Department of Education and Training). (2020). <em>High impact teaching strategies: Excellence in teaching and learning</em> (Rev. ed.). Licensed under CC BY 4.0.</li>
+      <li>Willingham, D. T. (2006). How knowledge helps: It speeds and strengthens reading comprehension, learning—and thinking. <em>American Educator, 30</em>(1), 30–37.</li>
+      <li>Willingham, D. T. (2006/2007, Winter). The usefulness of brief instruction in reading comprehension strategies. <em>American Educator, 30</em>(4), 39–45.</li>
+      <li>Wright, T. S., Cervetti, G. N., Wise, C., &amp; McClung, N. A. (2022). The impact of knowledge-building through conceptually-coherent read alouds on vocabulary and comprehension. <em>Reading Psychology</em>. https://doi.org/10.1080/02702711.2021.2020187</li>
+    </ul>
+    <p class="source-note">NESA syllabus content and teaching advice are quoted exactly. Research findings are summarised in this module's own words.</p>
+  </section>
+
+  <div class="step-nav">
+    <button class="btn-action" id="prevBtn">← Previous</button>
+    <span id="stepCounter">Step 1 of 7</span>
+    <button class="btn-action" id="nextBtn">Next →</button>
+  </div>
+  <footer><p>Catholic Education Diocese of Wollongong — Building Background Knowledge Professional Learning Module</p></footer>
+</div>
+
+<script>
+(function(){
+  const N = 7; let cur = 1;
+  const tabs = document.querySelectorAll('.tab-btn'), secs = document.querySelectorAll('.content-section');
+  function show(n){ cur = n;
+    tabs.forEach(t => { const on = +t.dataset.step === n; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+    secs.forEach(s => s.classList.toggle('active', s.id === 'step' + n));
+    document.getElementById('stepCounter').textContent = 'Step ' + n + ' of ' + N;
+    document.getElementById('progressBar').style.width = (n / N * 100) + '%';
+    document.getElementById('prevBtn').disabled = n === 1; document.getElementById('nextBtn').disabled = n === N;
+    window.scrollTo({top: 0, behavior: 'smooth'}); }
+  tabs.forEach(t => t.addEventListener('click', () => show(+t.dataset.step)));
+  document.getElementById('prevBtn').addEventListener('click', () => cur > 1 && show(cur - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => cur < N && show(cur + 1));
+  document.querySelectorAll('.flip-card').forEach(c => { const f = () => { const on = c.classList.toggle('flipped'); c.setAttribute('aria-pressed', on);
+      c.querySelector('.flip-front').setAttribute('aria-hidden', on); c.querySelector('.flip-back').setAttribute('aria-hidden', !on); };
+    c.addEventListener('click', f); c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f(); } }); });
+  document.querySelectorAll('.sw-tabs').forEach(g => g.addEventListener('click', e => { const b = e.target.closest('.sw-tab'); if (!b) return;
+    g.querySelectorAll('.sw-tab').forEach(x => { const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-selected', on); });
+    let p = g.nextElementSibling; while (p && p.classList.contains('sw-panel')) { p.hidden = p.dataset.k !== b.dataset.k; p = p.nextElementSibling; } }));
+  const OUT = {
+    a: '<strong>Activate, then extend.</strong> Use a brief activating routine (Step 6) to bring knowledge to mind, check for misconceptions, and move quickly to texts that deepen and extend what students know.',
+    b: '<strong>Activate, check and fill the gaps.</strong> Activate to find out what students know, then build the missing concepts and vocabulary before and during reading, so every student can access the text.',
+    c: '<strong>Build first.</strong> Explicitly build the field: concrete experiences, read-alouds of connected texts, key concepts and vocabulary, then activate this new knowledge before students read or write independently.'};
+  document.querySelectorAll('.decide button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.decide button').forEach(x => x.classList.toggle('on', x === b));
+    document.getElementById('decideOut').innerHTML = OUT[b.dataset.d]; }));
+  show(1);
+})();
+</script>
+
+</body>
+</html>
